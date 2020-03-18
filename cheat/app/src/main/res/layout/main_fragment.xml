@@ -5,16 +5,43 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/primaryDarkColor"
     tools:context=".ui.main.MainFragment">
 
-    <TextView
-        android:id="@+id/message"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="MainFragment"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <include
+                android:id="@+id/title_paired_devices"
+                layout="@layout/item_title_text"/>
+
+            <include
+                android:id="@+id/separator"
+                layout="@layout/item_separator"/>
+
+            <include
+                layout="@layout/item_text"/>
+
+            <include
+                android:id="+@id/separator2"
+                layout="@layout/item_separator"/>
+
+            <include
+                android:id="@+id/title_paired_devices"
+                layout="@layout/item_title_text"/>
+
+            <include
+                android:id="+@id/separator3"
+                layout="@layout/item_separator"/>
+
+        </LinearLayout>
+
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Cheat</string>
+    <string name="paired_devices">Paired Devices</string>
 </resources>

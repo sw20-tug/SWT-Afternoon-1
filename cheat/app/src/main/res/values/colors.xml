@@ -8,4 +8,6 @@
     <color name="secondaryDarkColor">#002f6c</color>
     <color name="primaryTextColor">#ffffff</color>
     <color name="secondaryTextColor">#ffffff</color>
+    <color name="separator_light">#e3e3e3</color>
+    <color name="separator_dark">#000000</color>
 </resources>
