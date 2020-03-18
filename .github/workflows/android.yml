@@ -20,6 +20,11 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew build
       working-directory: ./cheat
-    - name: Execute unit tests with Gradle
-      run: ./gradlew test
-      working-directory: ./cheat
+    - name: Upload artifact
+      uses: actions/upload-artifact@v1.0.0
+      if: always()
+      with:
+        # Artifact name
+        name: Build Result
+        # Directory containing files to upload
+        path: ./cheat/app/build/
