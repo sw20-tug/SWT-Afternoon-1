@@ -22,7 +22,8 @@ Using Android Studio, build the project by clicking at the hammer icon on the to
 Alternatively, you can build the project via the command line:
 
 1. Navigate to the project root
-2. Enter [TODO]
+2. Enter ./gradlew build
+(make sure that you have the JDK in your PATH variable)
 
 ## Run
 
@@ -38,4 +39,6 @@ To Execute tests via Android Studio you can do the following:
 
 Alternatively, tests can be executed via the command line:
 
-[TODO]
+1. Navigate to the project root
+2. Enter ./gradlew test for unit tests
+3. Enter ./gradlew connectedAndroidTest for instrumented unit tests

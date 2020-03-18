@@ -20,3 +20,6 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew build
       working-directory: ./cheat
+    - name: Execute unit tests with Gradle
+      run: ./gradlew test
+      working-directory: ./cheat
