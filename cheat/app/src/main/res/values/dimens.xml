@@ -2,6 +2,6 @@
 <resources>
     <dimen name="margin_text">16dp</dimen>
     <dimen name="text_size_normal">20sp</dimen>
-    <dimen name="separator_hight">1dp</dimen>
+    <dimen name="separator_hight">0.5dp</dimen>
     <dimen name="margin_text_small">12dp</dimen>
 </resources>

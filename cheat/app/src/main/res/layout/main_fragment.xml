@@ -21,24 +21,21 @@
                 android:id="@+id/title_paired_devices"
                 layout="@layout/item_title_text"/>
 
-            <include
-                android:id="@+id/separator"
-                layout="@layout/item_separator"/>
-
-            <include
-                layout="@layout/item_text"/>
-
-            <include
-                android:id="+@id/separator2"
-                layout="@layout/item_separator"/>
+            <ListView
+                android:id="@+id/list_paired_devices"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+            </ListView>
 
             <include
                 android:id="@+id/title_paired_devices"
                 layout="@layout/item_title_text"/>
 
-            <include
-                android:id="+@id/separator3"
-                layout="@layout/item_separator"/>
+            <ListView
+                android:id="@+id/list_nearby_devices"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+            </ListView>
 
         </LinearLayout>
 

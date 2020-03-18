@@ -6,7 +6,7 @@
 
     <View
         app:layout_constraintTop_toTopOf="parent"
-        android:background="@color/separator_light"
+        android:background="@color/separator_dark"
         android:layout_width="match_parent"
         android:layout_height="@dimen/separator_hight"/>
 
