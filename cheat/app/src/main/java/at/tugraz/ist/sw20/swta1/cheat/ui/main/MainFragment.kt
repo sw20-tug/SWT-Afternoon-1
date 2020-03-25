@@ -57,6 +57,7 @@ class MainFragment : Fragment() {
             if (resultCode == Activity.RESULT_OK) {
                 if (bluetoothAdapter!!.isEnabled) {
                     Toast.makeText(activity, "Bluetooth enabled", Toast.LENGTH_SHORT).show()
+                    /*
                     val service = BluetoothService(bluetoothAdapter!!)
                     service.getPairedDevices().forEach { device ->
                         Log.println(Log.INFO, "Paired device", device.name)
@@ -66,6 +67,7 @@ class MainFragment : Fragment() {
                     }
                     //Thread.sleep(15000)
                     service.stopDiscovery(activity!!)
+                    */
                 } else {
                     Toast.makeText(activity, "Bluetooth disabled", Toast.LENGTH_SHORT).show()
                 }

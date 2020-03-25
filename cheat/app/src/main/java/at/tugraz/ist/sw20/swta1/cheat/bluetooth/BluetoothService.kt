@@ -21,6 +21,9 @@ class BluetoothService(private val adapter: BluetoothAdapter) {
         if(receiver != null) {
             activity.unregisterReceiver(receiver)
         }
+        if(adapter.isDiscovering) {
+            adapter.cancelDiscovery()
+        }
         
         // Create a BroadcastReceiver for ACTION_FOUND.
         receiver = object : BroadcastReceiver() {
