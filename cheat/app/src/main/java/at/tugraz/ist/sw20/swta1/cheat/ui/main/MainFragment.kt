@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.ListView
 import androidx.lifecycle.ViewModelProvider
 import android.widget.Toast
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import at.tugraz.ist.sw20.swta1.cheat.R
 import at.tugraz.ist.sw20.swta1.cheat.bluetooth.BluetoothService
@@ -74,6 +75,7 @@ class MainFragment : Fragment() {
                 if (bluetoothAdapter!!.isEnabled) {
                     Toast.makeText(activity, "Bluetooth enabled", Toast.LENGTH_SHORT).show()
                     viewModel.bluetoothService = BluetoothService(bluetoothAdapter!!)
+                    viewModel.nearbyDevices = MutableLiveData()
                     viewModel.nearbyDevices.value = mutableListOf()
 
                     viewModel.nearbyDevices.observe(this, Observer { deviceList ->
