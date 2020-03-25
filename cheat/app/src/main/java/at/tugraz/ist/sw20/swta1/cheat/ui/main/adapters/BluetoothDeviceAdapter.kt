@@ -1,5 +1,6 @@
 package at.tugraz.ist.sw20.swta1.cheat.ui.main.adapters
 
+import android.bluetooth.BluetoothDevice
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -8,8 +9,7 @@ import android.widget.BaseAdapter
 import android.widget.TextView
 import at.tugraz.ist.sw20.swta1.cheat.R
 
-// TODO change to device list
-class BluetoothDeviceAdapter(val ctx: Context, val devices: List<Any>) :
+class BluetoothDeviceAdapter(private val ctx: Context, private val devices: List<BluetoothDevice>) :
         BaseAdapter() {
 
     private val inflater: LayoutInflater
@@ -19,7 +19,7 @@ class BluetoothDeviceAdapter(val ctx: Context, val devices: List<Any>) :
         lateinit var txtName: TextView
     }
 
-    override fun getItem(position: Int): Any {
+    override fun getItem(position: Int): BluetoothDevice {
         return devices[position]
     }
 
@@ -49,8 +49,8 @@ class BluetoothDeviceAdapter(val ctx: Context, val devices: List<Any>) :
         }
         val titleTextView = viewHolder.txtName
 
-        val device = getItem(position) as Any
-        titleTextView.text = device.toString() // TODO change to name
+        val device = getItem(position) as BluetoothDevice
+        titleTextView.text = device.name
         return view
     }
 }
