@@ -42,7 +42,8 @@ class BluetoothDeviceAdapter(val ctx: Context, val devices: List<Any>) :
             viewHolder.txtName = view.findViewById(R.id.device_name) as TextView
 
             view.tag = viewHolder
-        } else {
+        }
+        else {
             view = convertView
             viewHolder = convertView.tag as ViewHolder
         }

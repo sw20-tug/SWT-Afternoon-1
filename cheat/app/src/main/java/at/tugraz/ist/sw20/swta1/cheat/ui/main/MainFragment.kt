@@ -4,6 +4,7 @@ import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -11,7 +12,9 @@ import android.view.ViewGroup
 import android.widget.ListView
 import androidx.lifecycle.ViewModelProvider
 import android.widget.Toast
+import androidx.lifecycle.Observer
 import at.tugraz.ist.sw20.swta1.cheat.R
+import at.tugraz.ist.sw20.swta1.cheat.bluetooth.BluetoothService
 import at.tugraz.ist.sw20.swta1.cheat.ui.main.adapters.BluetoothDeviceAdapter
 import kotlinx.android.synthetic.main.item_title_cell.view.*
 
@@ -22,6 +25,9 @@ class MainFragment : Fragment() {
     }
 
     private lateinit var viewModel: MainViewModel
+
+    lateinit var lvPairedDevices: ListView
+    lateinit var lvNearbyDevices: ListView
 
     private val REQUEST_ENABLE_BLUETOOTH: Int = 1
     private var bluetoothAdapter: BluetoothAdapter? = null
@@ -43,22 +49,14 @@ class MainFragment : Fragment() {
         }
 
         val root = inflater.inflate(R.layout.main_fragment, container, false)
-        val lvPairedDevices: ListView = root.findViewById(R.id.list_paired_devices)
-        val lvNearbyDevices: ListView = root.findViewById(R.id.list_nearby_devices)
-        // TODO lvPairedDevices.onItemClickListener
+        lvPairedDevices = root.findViewById(R.id.list_paired_devices)
+        lvNearbyDevices = root.findViewById(R.id.list_nearby_devices)
+
         val titlePaired: View = root.findViewById(R.id.title_paired_devices)
         val titleNearby: View = root.findViewById(R.id.title_nearby_devices)
 
         titlePaired.title.text = getString(R.string.paired_devices)
         titleNearby.title.text = getString(R.string.nearby_devices)
-
-        val devicesPaired = ArrayList<Any>()
-        val adapterPaired = BluetoothDeviceAdapter(this.context!!, devicesPaired)
-        lvPairedDevices.adapter = adapterPaired
-
-        val devicesNearby = ArrayList<Any>()
-        val adapterNearby = BluetoothDeviceAdapter(this.context!!, devicesNearby)
-        lvPairedDevices.adapter = adapterNearby
 
         return root
     }
@@ -75,6 +73,24 @@ class MainFragment : Fragment() {
             if (resultCode == Activity.RESULT_OK) {
                 if (bluetoothAdapter!!.isEnabled) {
                     Toast.makeText(activity, "Bluetooth enabled", Toast.LENGTH_SHORT).show()
+                    viewModel.bluetoothService = BluetoothService(bluetoothAdapter!!)
+                    viewModel.nearbyDevices.value = mutableListOf()
+
+                    viewModel.nearbyDevices.observe(this, Observer { deviceList ->
+                        viewModel.bluetoothService.discoverDevices(activity!!) { device ->
+                            if (deviceList.find { d -> d.address == device.address } == null) {
+                                Log.println(Log.INFO, "Found Nearby Device: ", device.name)
+                                deviceList.add(device)
+                                val adapterNearby = BluetoothDeviceAdapter(this.context!!, deviceList)
+                                lvNearbyDevices.adapter = adapterNearby
+                            }
+                        }
+                    })
+
+                    val adapterPaired = BluetoothDeviceAdapter(this.context!!, viewModel.getPairedDevices())
+                    lvPairedDevices.adapter = adapterPaired
+
+
                     /*
                     val service = BluetoothService(bluetoothAdapter!!)
                     service.getPairedDevices().forEach { device ->
