@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/item_header_text"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/title"
+        android:text="CHAT_PARTNER_NAME"
+        android:textSize="@dimen/text_size_header"
+        android:textColor="@color/primaryTextColor"
+        android:padding="@dimen/margin_text_small"
+        android:background="@color/primaryDarkHeaderColor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/separator_bottom"/>
+
+    <TextView
+        android:id="@+id/connection_status"
+        android:text="@string/connected_status"
+        android:textColor="@color/primaryTextColor"
+        android:layout_marginEnd="@dimen/margin_text_status"
+        android:layout_marginBottom="@dimen/margin_text_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/title"/>
+
+    <include
+        android:id="@+id/separator_bottom"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        app:layout_constraintTop_toBottomOf="@id/title"
+        layout="@layout/item_separator"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
