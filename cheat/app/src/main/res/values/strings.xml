@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Cheat</string>
+    <string name="paired_devices">Paired Devices</string>
+    <string name="nearby_devices">Nearby Devices</string>
 </resources>
