@@ -22,6 +22,7 @@ class ChatFragment : Fragment() {
         val view =  inflater.inflate(R.layout.chat_fragment, container, false)
         val listView = view.findViewById<ListView>(R.id.chat_history)
 
+        // TODO Delete these entries once we get real entries from Backend
         val chatEntries = arrayListOf(
             ChatEntry("Hey", true, Date()),
             ChatEntry("Yo", false, Date()),
