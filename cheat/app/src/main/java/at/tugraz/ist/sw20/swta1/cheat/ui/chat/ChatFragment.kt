@@ -4,9 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ListView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import at.tugraz.ist.sw20.swta1.cheat.R
 import java.util.Date
 
@@ -20,7 +21,6 @@ class ChatFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
         val view =  inflater.inflate(R.layout.chat_fragment, container, false)
-        val listView = view.findViewById<ListView>(R.id.chat_history)
 
         // TODO Delete these entries once we get real entries from Backend
         val chatEntries = arrayListOf(
@@ -47,11 +47,15 @@ class ChatFragment : Fragment() {
             ChatEntry("Hey", true, Date()),
             ChatEntry("Yo", false, Date())
         )
-        val adapter = ChatHistoryAdapter(
-            view.context,
+        val chatAdapter = ChatHistoryAdapter(
             chatEntries
         )
-        listView.adapter = adapter
+
+        val recyclerView = view.findViewById<RecyclerView>(R.id.chat_history).apply {
+            layoutManager = LinearLayoutManager(context!!)
+            adapter = chatAdapter
+        }
+
         return view
     }
 

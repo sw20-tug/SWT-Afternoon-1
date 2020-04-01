@@ -14,7 +14,7 @@
             android:id="@+id/item_header_text"
             layout="@layout/item_header_text"/>
 
-        <ListView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/chat_history"
             android:divider="@null"
             android:layout_width="match_parent"

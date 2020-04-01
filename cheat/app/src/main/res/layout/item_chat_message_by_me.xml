@@ -8,11 +8,12 @@
     <LinearLayout
         android:background="@drawable/rounded_background"
         android:layout_margin="@dimen/margin_text_small"
-        android:layout_width="0dp"
         android:minWidth="@dimen/chat_item_min_width"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintWidth_percent="0.7"
         app:layout_constraintWidth_max="wrap"
         android:orientation="vertical">

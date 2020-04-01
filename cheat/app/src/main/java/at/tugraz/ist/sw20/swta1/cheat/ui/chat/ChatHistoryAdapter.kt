@@ -1,36 +1,33 @@
 package at.tugraz.ist.sw20.swta1.cheat.ui.chat
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.BaseAdapter
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 import at.tugraz.ist.sw20.swta1.cheat.R
 
-class ChatHistoryAdapter(private val context: Context,
-                         private val dataSource: ArrayList<ChatEntry>) : BaseAdapter() {
-    private val inflater: LayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+class ChatHistoryAdapter(private val dataSource: ArrayList<ChatEntry>) : RecyclerView.Adapter<ChatHistoryAdapter.ChatViewHolder>() {
 
-    override fun getCount(): Int {
-        return dataSource.size
+    class ChatViewHolder(val view: View) : RecyclerView.ViewHolder(view)
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(viewType, parent, false)
+        return ChatViewHolder(view)
     }
 
-    override fun getItem(position: Int): Any {
-        return dataSource[position]
+    override fun onBindViewHolder(holder: ChatViewHolder, position: Int) {
+        holder.view.findViewById<TextView>(R.id.chat_message).text = dataSource[position].getMessage()
+        holder.view.findViewById<TextView>(R.id.chat_timestamp).text = dataSource[position].getFormattedTimestamp()
     }
 
-    override fun getItemId(position: Int): Long {
-        return position.toLong()
+    override fun getItemViewType(position: Int): Int {
+        var layout = R.layout.item_chat_message_by_me
+        if(!dataSource[position].isWrittenByMe()) {
+            layout = R.layout.item_chat_message_by_other
+        }
+        return layout
     }
 
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        val entry = getItem(position) as ChatEntry
-        val layout = if(entry.isWrittenByMe()) R.layout.item_chat_message_by_me else R.layout.item_chat_message_by_other
-        val rowView = inflater.inflate(layout, parent, false)
-        val textViewMessage = rowView.findViewById<TextView>(R.id.chat_message)
-        textViewMessage.text = entry.getMessage()
-        rowView.findViewById<TextView>(R.id.chat_timestamp).text = entry.getFormattedTimestamp()
-        return rowView
-    }
+    override fun getItemCount() = dataSource.size
 }
