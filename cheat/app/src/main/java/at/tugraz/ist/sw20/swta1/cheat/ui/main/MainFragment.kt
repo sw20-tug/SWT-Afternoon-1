@@ -21,6 +21,7 @@ import at.tugraz.ist.sw20.swta1.cheat.R
 import at.tugraz.ist.sw20.swta1.cheat.bluetooth.BluetoothService
 import at.tugraz.ist.sw20.swta1.cheat.bluetooth.InterfaceBluetoothDevice
 import at.tugraz.ist.sw20.swta1.cheat.bluetooth.MockBluetoothDevice
+import at.tugraz.ist.sw20.swta1.cheat.bluetooth.RealBluetoothDevice
 import at.tugraz.ist.sw20.swta1.cheat.ui.main.adapters.BluetoothDeviceAdapter
 import kotlinx.android.synthetic.main.item_title_cell.view.*
 
@@ -64,31 +65,13 @@ class MainFragment : Fragment() {
         titlePaired.title.text = getString(R.string.paired_devices)
         titleNearby.title.text = getString(R.string.nearby_devices)
 
-
-        val adapterPaired = BluetoothDeviceAdapter(this.context!!, listOf(
-            MockBluetoothDevice("test", "0.0.0.0"),
-            MockBluetoothDevice("test", "0.0.0.0"),
-            MockBluetoothDevice("test", "0.0.0.0"),
-            MockBluetoothDevice("test", "0.0.0.0"),
-            MockBluetoothDevice("test", "0.0.0.0"),
-            MockBluetoothDevice("test", "0.0.0.0"),
-            MockBluetoothDevice("test", "0.0.0.0"),
-            MockBluetoothDevice("test", "0.0.0.0"),
-            MockBluetoothDevice("test", "0.0.0.0"),
-            MockBluetoothDevice("test", "0.0.0.0"),
-            MockBluetoothDevice("test", "0.0.0.0"),
-            MockBluetoothDevice("test", "0.0.0.0"),
-            MockBluetoothDevice("test", "0.0.0.0"),
-            MockBluetoothDevice("test", "0.0.0.0"),
-            MockBluetoothDevice("test", "0.0.0.0"),
-            MockBluetoothDevice("test", "0.0.0.0"),
-            MockBluetoothDevice("test", "0.0.0.0"),
-            MockBluetoothDevice("test", "0.0.0.0")
-        ))
         lvPairedDevices.layoutManager = LinearLayoutManager(this.context)
-        lvPairedDevices.adapter = adapterPaired
         lvPairedDevices.isNestedScrollingEnabled = false
         lvPairedDevices.setHasFixedSize(true)
+        lvNearbyDevices.layoutManager = LinearLayoutManager(this.context)
+        lvNearbyDevices.isNestedScrollingEnabled = false
+        lvNearbyDevices.setHasFixedSize(true)
+
 
         return root
     }
@@ -115,15 +98,14 @@ class MainFragment : Fragment() {
                         viewModel.bluetoothService.discoverDevices(activity!!) { device ->
                             if (deviceList.find { d -> d.address == device.address } == null) {
                                 Log.println(Log.INFO, "Found Nearby Device: ", device.name)
-                                // deviceList.add(device)
+                                deviceList.add(RealBluetoothDevice(device))
                                 val adapterNearby = BluetoothDeviceAdapter(this.context!!, deviceList)
                                 lvNearbyDevices.adapter = adapterNearby
                             }
                         }
                     })
 
-                    // val adapterPaired = BluetoothDeviceAdapter(this.context!!, viewModel.getPairedDevices())
-                    val adapterPaired = BluetoothDeviceAdapter(this.context!!, listOf(MockBluetoothDevice("test", "0.0.0.0")))
+                    val adapterPaired = BluetoothDeviceAdapter(this.context!!, viewModel.getPairedDevices())
                     lvPairedDevices.adapter = adapterPaired
 
 

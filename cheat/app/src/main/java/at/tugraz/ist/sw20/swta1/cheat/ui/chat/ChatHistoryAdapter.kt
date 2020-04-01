@@ -10,7 +10,7 @@ import at.tugraz.ist.sw20.swta1.cheat.R
 import at.tugraz.ist.sw20.swta1.cheat.ui.chat.ChatEntry
 
 class ChatHistoryAdapter(private val context: Context,
-                         private val dataSource: ArrayList<ChatEntry>) : BaseAdapter() {
+                         private val dataSource: ArrayList<ChatEntry>) : BaseAdapter()  {
     private val inflater: LayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
     override fun getCount(): Int {

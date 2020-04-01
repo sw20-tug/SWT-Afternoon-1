@@ -13,8 +13,8 @@ class BluetoothService(private val adapter: BluetoothAdapter) {
     
     private var receiver : BroadcastReceiver? = null
     
-    fun getPairedDevices() : List<BluetoothDevice> {
-        return adapter.bondedDevices.toList()
+    fun getPairedDevices() : List<RealBluetoothDevice> {
+        return adapter.bondedDevices.map { device -> RealBluetoothDevice(device) }.toList()
     }
     
     fun discoverDevices(activity: Activity, onDeviceFound: (BluetoothDevice) -> Unit) {

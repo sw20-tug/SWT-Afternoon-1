@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import at.tugraz.ist.sw20.swta1.cheat.bluetooth.BluetoothService
 import at.tugraz.ist.sw20.swta1.cheat.bluetooth.InterfaceBluetoothDevice
+import at.tugraz.ist.sw20.swta1.cheat.bluetooth.RealBluetoothDevice
 
 class MainViewModel : ViewModel() {
 
@@ -13,7 +14,7 @@ class MainViewModel : ViewModel() {
 
     lateinit var nearbyDevices: MutableLiveData<MutableList<InterfaceBluetoothDevice>>
 
-    fun getPairedDevices(): List<BluetoothDevice> {
+    fun getPairedDevices(): List<RealBluetoothDevice> {
         bluetoothService.getPairedDevices().forEach { device ->
             Log.println(Log.INFO, "Paired device", device.name)
         }

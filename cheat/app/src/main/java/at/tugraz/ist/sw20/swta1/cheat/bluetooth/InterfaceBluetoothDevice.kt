@@ -1,9 +1,18 @@
 package at.tugraz.ist.sw20.swta1.cheat.bluetooth
 
+import android.bluetooth.BluetoothDevice
+
 interface InterfaceBluetoothDevice {
-    var name : String
-    var address: String
+    val name : String
+    val address: String
 }
 
-class MockBluetoothDevice(override var name: String, override var address: String) : InterfaceBluetoothDevice {
+class MockBluetoothDevice(override val name: String, override val address: String) : InterfaceBluetoothDevice {
+}
+
+class RealBluetoothDevice(val device: BluetoothDevice): InterfaceBluetoothDevice {
+    override val name: String
+        get() = device.name
+    override val address: String
+        get() = device.address
 }
