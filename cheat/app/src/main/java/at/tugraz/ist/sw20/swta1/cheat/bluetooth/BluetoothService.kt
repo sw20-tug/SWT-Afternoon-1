@@ -13,11 +13,11 @@ class BluetoothService(private val adapter: BluetoothAdapter) {
     
     private var receiver : BroadcastReceiver? = null
     
-    fun getPairedDevices() : List<BluetoothDevice> {
-        return adapter.bondedDevices.toList()
+    fun getPairedDevices() : List<RealBluetoothDevice> {
+        return adapter.bondedDevices.map { device -> RealBluetoothDevice(device) }.toList()
     }
     
-    fun discoverDevices(activity: Activity, onDeviceFound: (BluetoothDevice) -> Unit) {
+    fun discoverDevices(activity: Activity, onDeviceFound: (BluetoothDevice) -> Unit, onDiscoveryStopped: () -> Unit) {
         if(receiver != null) {
             activity.unregisterReceiver(receiver)
         }
@@ -33,16 +33,28 @@ class BluetoothService(private val adapter: BluetoothAdapter) {
                     BluetoothDevice.ACTION_FOUND -> {
                         // Discovery has found a device. Get the BluetoothDevice
                         // object and its info from the Intent.
-                        val device: BluetoothDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
-                        Log.println(Log.DEBUG, "Found device", device.name)
-                        onDeviceFound(device)
+                        val device: BluetoothDevice? = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
+                        if(device?.name != null) {
+                            Log.println(Log.DEBUG, "Found device", device.name)
+                            onDeviceFound(device)
+                        }
                     }
                 }
             }
         }
+
+        val finishedReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                Log.println(Log.DEBUG, "Bluetooth", "Discovery stopped")
+                onDiscoveryStopped()
+            }
+        }
         
         activity.registerReceiver(receiver, IntentFilter(BluetoothDevice.ACTION_FOUND))
-        adapter.startDiscovery()
+        activity.registerReceiver(finishedReceiver, IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED))
+        if(!adapter.startDiscovery()) {
+            Log.println(Log.ERROR, "Bluetooth", "Error starting discovery")
+        }
         Log.println(Log.DEBUG, "Bluetooth", "Start discovery")
     }
     
