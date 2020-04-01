@@ -1,22 +1,20 @@
 package at.tugraz.ist.sw20.swta1.cheat
 
-import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import at.tugraz.ist.sw20.swta1.cheat.ui.main.MainFragment
+import androidx.appcompat.app.AppCompatActivity
+import at.tugraz.ist.sw20.swta1.cheat.ui.chat.ChatFragment
 
-class MainActivity : AppCompatActivity() {
-    
+class ChatActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
-                .replace(R.id.container, MainFragment.newInstance())
+                .replace(R.id.container, ChatFragment.newInstance())
                 .commitNow()
         }
 
-        //val intent = Intent(this, ChatActivity::class.java)
-        //startActivity(intent)
+        supportActionBar?.hide()
     }
 }
