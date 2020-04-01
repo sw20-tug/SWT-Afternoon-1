@@ -30,8 +30,8 @@ class BluetoothService(private val adapter: BluetoothAdapter) {
     val uuid = UUID.randomUUID()
     var state: BluetoothState = BluetoothState.DISABLED
     
-    fun getPairedDevices(): List<BluetoothDevice> {
-        return adapter.bondedDevices.toList()
+    fun getPairedDevices() : List<RealBluetoothDevice> {
+        return adapter.bondedDevices.map { device -> RealBluetoothDevice(device) }.toList()
     }
     
     fun setOnStateChangeListener(onStateChange: (BluetoothState) -> Unit) {
@@ -47,11 +47,8 @@ class BluetoothService(private val adapter: BluetoothAdapter) {
         onStateChange(state)
     }
     
-    fun discoverDevices(activity: Activity, onDeviceFound: (BluetoothDevice) -> Unit): Boolean {
-        if (state != BluetoothState.READY) {
-            return false
-        }
-        if (receiver != null) {
+    fun discoverDevices(activity: Activity, onDeviceFound: (BluetoothDevice) -> Unit, onDiscoveryStopped: () -> Unit) {
+        if(state != BluetoothState.READY || receiver != null) {
             activity.unregisterReceiver(receiver)
         }
         if (adapter.isDiscovering) {
@@ -64,7 +61,7 @@ class BluetoothService(private val adapter: BluetoothAdapter) {
                 1 /* <- is for identifying this request, random number */
             )
             
-            return false
+            return
         }
         
         // Create a BroadcastReceiver for ACTION_FOUND.
@@ -75,20 +72,30 @@ class BluetoothService(private val adapter: BluetoothAdapter) {
                     BluetoothDevice.ACTION_FOUND -> {
                         // Discovery has found a device. Get the BluetoothDevice
                         // object and its info from the Intent.
-                        val device: BluetoothDevice =
-                            intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
-                        Log.println(Log.DEBUG, tag, device.name)
-                        onDeviceFound(device)
+                        val device: BluetoothDevice? = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
+                        if(device?.name != null) {
+                            Log.println(Log.DEBUG, "Found device", device.name)
+                            onDeviceFound(device)
+                        }
                     }
                 }
             }
         }
+
+        val finishedReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                Log.println(Log.DEBUG, "Bluetooth", "Discovery stopped")
+                onDiscoveryStopped()
+            }
+        }
         
         activity.registerReceiver(receiver, IntentFilter(BluetoothDevice.ACTION_FOUND))
-        adapter.startDiscovery()
+        activity.registerReceiver(finishedReceiver, IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED))
+        if(!adapter.startDiscovery()) {
+            Log.println(Log.ERROR, tag, "Error starting discovery")
+        }
         updateState(BluetoothState.READY)
         Log.println(Log.DEBUG, tag, "Start discovery")
-        return true
     }
     
     fun stopDiscovery(activity: Activity) {
