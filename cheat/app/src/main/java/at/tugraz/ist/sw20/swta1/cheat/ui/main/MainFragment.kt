@@ -2,6 +2,7 @@ package at.tugraz.ist.sw20.swta1.cheat.ui.main
 
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothDevice
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -14,8 +15,12 @@ import androidx.lifecycle.ViewModelProvider
 import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import at.tugraz.ist.sw20.swta1.cheat.R
 import at.tugraz.ist.sw20.swta1.cheat.bluetooth.BluetoothService
+import at.tugraz.ist.sw20.swta1.cheat.bluetooth.InterfaceBluetoothDevice
+import at.tugraz.ist.sw20.swta1.cheat.bluetooth.MockBluetoothDevice
 import at.tugraz.ist.sw20.swta1.cheat.ui.main.adapters.BluetoothDeviceAdapter
 import kotlinx.android.synthetic.main.item_title_cell.view.*
 
@@ -27,8 +32,8 @@ class MainFragment : Fragment() {
 
     private lateinit var viewModel: MainViewModel
 
-    lateinit var lvPairedDevices: ListView
-    lateinit var lvNearbyDevices: ListView
+    lateinit var lvPairedDevices: RecyclerView
+    lateinit var lvNearbyDevices: RecyclerView
 
     private val REQUEST_ENABLE_BLUETOOTH: Int = 1
     private var bluetoothAdapter: BluetoothAdapter? = null
@@ -59,6 +64,32 @@ class MainFragment : Fragment() {
         titlePaired.title.text = getString(R.string.paired_devices)
         titleNearby.title.text = getString(R.string.nearby_devices)
 
+
+        val adapterPaired = BluetoothDeviceAdapter(this.context!!, listOf(
+            MockBluetoothDevice("test", "0.0.0.0"),
+            MockBluetoothDevice("test", "0.0.0.0"),
+            MockBluetoothDevice("test", "0.0.0.0"),
+            MockBluetoothDevice("test", "0.0.0.0"),
+            MockBluetoothDevice("test", "0.0.0.0"),
+            MockBluetoothDevice("test", "0.0.0.0"),
+            MockBluetoothDevice("test", "0.0.0.0"),
+            MockBluetoothDevice("test", "0.0.0.0"),
+            MockBluetoothDevice("test", "0.0.0.0"),
+            MockBluetoothDevice("test", "0.0.0.0"),
+            MockBluetoothDevice("test", "0.0.0.0"),
+            MockBluetoothDevice("test", "0.0.0.0"),
+            MockBluetoothDevice("test", "0.0.0.0"),
+            MockBluetoothDevice("test", "0.0.0.0"),
+            MockBluetoothDevice("test", "0.0.0.0"),
+            MockBluetoothDevice("test", "0.0.0.0"),
+            MockBluetoothDevice("test", "0.0.0.0"),
+            MockBluetoothDevice("test", "0.0.0.0")
+        ))
+        lvPairedDevices.layoutManager = LinearLayoutManager(this.context)
+        lvPairedDevices.adapter = adapterPaired
+        lvPairedDevices.isNestedScrollingEnabled = false
+        lvPairedDevices.setHasFixedSize(true)
+
         return root
     }
 
@@ -70,6 +101,8 @@ class MainFragment : Fragment() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+
+
         if (requestCode == REQUEST_ENABLE_BLUETOOTH) {
             if (resultCode == Activity.RESULT_OK) {
                 if (bluetoothAdapter!!.isEnabled) {
@@ -82,14 +115,15 @@ class MainFragment : Fragment() {
                         viewModel.bluetoothService.discoverDevices(activity!!) { device ->
                             if (deviceList.find { d -> d.address == device.address } == null) {
                                 Log.println(Log.INFO, "Found Nearby Device: ", device.name)
-                                deviceList.add(device)
+                                // deviceList.add(device)
                                 val adapterNearby = BluetoothDeviceAdapter(this.context!!, deviceList)
                                 lvNearbyDevices.adapter = adapterNearby
                             }
                         }
                     })
 
-                    val adapterPaired = BluetoothDeviceAdapter(this.context!!, viewModel.getPairedDevices())
+                    // val adapterPaired = BluetoothDeviceAdapter(this.context!!, viewModel.getPairedDevices())
+                    val adapterPaired = BluetoothDeviceAdapter(this.context!!, listOf(MockBluetoothDevice("test", "0.0.0.0")))
                     lvPairedDevices.adapter = adapterPaired
 
 
