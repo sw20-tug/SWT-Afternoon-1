@@ -16,7 +16,7 @@ class MainActivity : AppCompatActivity() {
                 .commitNow()
         }
 
-        val intent = Intent(this, ChatActivity::class.java)
-        startActivity(intent)
+        //val intent = Intent(this, ChatActivity::class.java)
+        //startActivity(intent)
     }
 }
