@@ -33,16 +33,20 @@ class BluetoothService(private val adapter: BluetoothAdapter) {
                     BluetoothDevice.ACTION_FOUND -> {
                         // Discovery has found a device. Get the BluetoothDevice
                         // object and its info from the Intent.
-                        val device: BluetoothDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
-                        Log.println(Log.DEBUG, "Found device", device.name)
-                        onDeviceFound(device)
+                        val device: BluetoothDevice? = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
+                        if(device?.name != null) {
+                            Log.println(Log.DEBUG, "Found device", device.name)
+                            onDeviceFound(device)
+                        }
                     }
                 }
             }
         }
         
         activity.registerReceiver(receiver, IntentFilter(BluetoothDevice.ACTION_FOUND))
-        adapter.startDiscovery()
+        if(!adapter.startDiscovery()) {
+            Log.println(Log.ERROR, "Bluetooth", "Error starting discovery")
+        }
         Log.println(Log.DEBUG, "Bluetooth", "Start discovery")
     }
     
