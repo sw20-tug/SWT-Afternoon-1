@@ -10,6 +10,8 @@
         android:layout_margin="@dimen/margin_text_small"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:minWidth="@dimen/chat_item_min_width"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintWidth_percent="0.7"
@@ -18,6 +20,15 @@
         <TextView
             android:id="@+id/chat_message"
             android:text="CHAT-MESSAGE"
+            android:textColor="@color/primaryTextColor"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/chat_timestamp"
+            android:text="13:35"
+            android:gravity="end"
+            android:textSize="@dimen/text_size_small"
             android:textColor="@color/primaryTextColor"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
