@@ -101,6 +101,19 @@ class BluetoothService(private val adapter: BluetoothAdapter) {
         }
         return true
     }
+    
+    fun sendMessage(message : ByteArray) {
+        if(state != BluetoothState.CONNECTED || currentConnection == null) {
+            return
+        }
+        
+        try {
+            currentConnection?.outStream?.write(message)
+        } catch (e : IOException) {
+            Log.e(connectionTag, "Error sending message", e)
+            // TODO disconnect
+        }
+    }
 
     @Synchronized
     private fun connect(device: BluetoothDevice, socket: BluetoothSocket) {
