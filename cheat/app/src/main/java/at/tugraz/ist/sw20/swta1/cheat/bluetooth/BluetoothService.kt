@@ -17,7 +17,7 @@ class BluetoothService(private val adapter: BluetoothAdapter) {
         return adapter.bondedDevices.map { device -> RealBluetoothDevice(device) }.toList()
     }
     
-    fun discoverDevices(activity: Activity, onDeviceFound: (BluetoothDevice) -> Unit) {
+    fun discoverDevices(activity: Activity, onDeviceFound: (BluetoothDevice) -> Unit, onDiscoveryStopped: () -> Unit) {
         if(receiver != null) {
             activity.unregisterReceiver(receiver)
         }
@@ -42,8 +42,16 @@ class BluetoothService(private val adapter: BluetoothAdapter) {
                 }
             }
         }
+
+        val finishedReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                Log.println(Log.DEBUG, "Bluetooth", "Discovery stopped")
+                onDiscoveryStopped()
+            }
+        }
         
         activity.registerReceiver(receiver, IntentFilter(BluetoothDevice.ACTION_FOUND))
+        activity.registerReceiver(finishedReceiver, IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED))
         if(!adapter.startDiscovery()) {
             Log.println(Log.ERROR, "Bluetooth", "Error starting discovery")
         }

@@ -17,6 +17,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import at.tugraz.ist.sw20.swta1.cheat.R
 import at.tugraz.ist.sw20.swta1.cheat.bluetooth.BluetoothService
 import at.tugraz.ist.sw20.swta1.cheat.bluetooth.RealBluetoothDevice
@@ -70,6 +71,22 @@ class MainFragment : Fragment() {
         lvNearbyDevices.isNestedScrollingEnabled = false
         lvNearbyDevices.setHasFixedSize(true)
 
+        val pullToRequestContainer = root.findViewById<SwipeRefreshLayout>(R.id.pull_to_refresh_container)
+        pullToRequestContainer.setOnRefreshListener {
+            viewModel.nearbyDevices.observe(viewLifecycleOwner, Observer { deviceList ->
+                viewModel.bluetoothService.discoverDevices(activity!!, { device ->
+                    if (deviceList.find { d -> d.address == device.address } == null) {
+                        Log.println(Log.INFO, "Found Nearby Device: ", device.name)
+                        deviceList.add(RealBluetoothDevice(device))
+                        val adapterNearby = BluetoothDeviceAdapter(this.context!!, deviceList)
+                        lvNearbyDevices.adapter = adapterNearby
+                    }
+                }, {
+                    pullToRequestContainer.isRefreshing = false
+                })
+            })
+        }
+
 
         return root
     }
@@ -78,12 +95,12 @@ class MainFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         // TODO: Use the ViewModel
-        if (bluetoothAdapter!!.isEnabled) {
+        if (bluetoothAdapter != null && bluetoothAdapter!!.isEnabled) {
             showBluetoothDevices()
         }
     }
 
-    fun showBluetoothDevices() {
+    private fun showBluetoothDevices() {
         Toast.makeText(activity, "Bluetooth enabled", Toast.LENGTH_SHORT).show()
         viewModel.bluetoothService = BluetoothService(bluetoothAdapter!!)
         viewModel.nearbyDevices = MutableLiveData()
@@ -94,31 +111,18 @@ class MainFragment : Fragment() {
         }
 
         viewModel.nearbyDevices.observe(viewLifecycleOwner, Observer { deviceList ->
-            viewModel.bluetoothService.discoverDevices(activity!!) { device ->
+            viewModel.bluetoothService.discoverDevices(activity!!, { device ->
                 if (deviceList.find { d -> d.address == device.address } == null) {
                     Log.println(Log.INFO, "Found Nearby Device: ", device.name)
                     deviceList.add(RealBluetoothDevice(device))
                     val adapterNearby = BluetoothDeviceAdapter(this.context!!, deviceList)
                     lvNearbyDevices.adapter = adapterNearby
                 }
-            }
+            }, {})
         })
 
         val adapterPaired = BluetoothDeviceAdapter(this.context!!, viewModel.getPairedDevices())
         lvPairedDevices.adapter = adapterPaired
-
-
-        /*
-        val service = BluetoothService(bluetoothAdapter!!)
-        service.getPairedDevices().forEach { device ->
-            Log.println(Log.INFO, "Paired device", device.name)
-        }
-        service.discoverDevices(activity!!) { device : BluetoothDevice ->
-            Log.println(Log.INFO, "Discovered device", device.name)
-        }
-        //Thread.sleep(15000)
-        service.stopDiscovery(activity!!)
-        */
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
