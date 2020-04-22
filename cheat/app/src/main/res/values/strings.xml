@@ -3,4 +3,5 @@
     <string name="connected_status">Connected</string>
     <string name="paired_devices">Paired Devices</string>
     <string name="nearby_devices">Nearby Devices</string>
+    <string name="text_entry_hint">Message</string>
 </resources>
