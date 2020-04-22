@@ -5,10 +5,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout
+        android:id="@+id/ll_chat_history"
         android:background="@color/primaryDarkColor"
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <include
             android:id="@+id/item_header_text"
@@ -17,8 +19,16 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/chat_history"
             android:divider="@null"
+            android:layout_weight="1"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="0dp"/>
+
+        <include
+            android:id="@+id/item_text_entry_field"
+            layout="@layout/item_text_entry_field"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/margin_field_small"/>
 
     </LinearLayout>
 

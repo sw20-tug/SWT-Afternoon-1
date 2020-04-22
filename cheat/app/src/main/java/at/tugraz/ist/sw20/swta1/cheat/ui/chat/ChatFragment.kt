@@ -56,6 +56,8 @@ class ChatFragment : Fragment() {
             adapter = chatAdapter
         }
 
+        (recyclerView.layoutManager as LinearLayoutManager).stackFromEnd = true
+
         return view
     }
 
