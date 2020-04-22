@@ -1,18 +1,15 @@
 package at.tugraz.ist.sw20.swta1.cheat.ui.main.adapters
 
-import android.bluetooth.BluetoothDevice
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.BaseAdapter
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import at.tugraz.ist.sw20.swta1.cheat.R
-import at.tugraz.ist.sw20.swta1.cheat.bluetooth.InterfaceBluetoothDevice
+import at.tugraz.ist.sw20.swta1.cheat.bluetooth.IBluetoothDevice
 import kotlinx.android.synthetic.main.item_text.view.*
 
-class BluetoothDeviceAdapter(private val ctx: Context, private val devices: List<InterfaceBluetoothDevice>) :
+class BluetoothDeviceAdapter(private val ctx: Context, private val devices: List<IBluetoothDevice>) :
         RecyclerView.Adapter<BluetoothDeviceAdapter.ViewHolder>() {
 
     class ViewHolder (view: View) : RecyclerView.ViewHolder(view) {
@@ -28,6 +25,10 @@ class BluetoothDeviceAdapter(private val ctx: Context, private val devices: List
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.txtName.text = devices.get(position).name
+        holder.txtName.text = devices[position].name
+    }
+    
+    fun getDeviceAt(position: Int) : IBluetoothDevice {
+        return devices[position]
     }
 }

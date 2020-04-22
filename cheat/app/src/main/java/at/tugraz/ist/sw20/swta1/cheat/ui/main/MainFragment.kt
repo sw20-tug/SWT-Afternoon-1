@@ -7,9 +7,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
@@ -19,10 +17,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import at.tugraz.ist.sw20.swta1.cheat.R
+import at.tugraz.ist.sw20.swta1.cheat.RecyclerItemClickListener
 import at.tugraz.ist.sw20.swta1.cheat.bluetooth.BluetoothService
 import at.tugraz.ist.sw20.swta1.cheat.bluetooth.RealBluetoothDevice
 import at.tugraz.ist.sw20.swta1.cheat.ui.main.adapters.BluetoothDeviceAdapter
 import kotlinx.android.synthetic.main.item_title_cell.view.*
+
 
 class MainFragment : Fragment() {
 
@@ -80,6 +80,23 @@ class MainFragment : Fragment() {
                         deviceList.add(RealBluetoothDevice(device))
                         val adapterNearby = BluetoothDeviceAdapter(this.context!!, deviceList)
                         lvNearbyDevices.adapter = adapterNearby
+                        lvNearbyDevices.addOnItemTouchListener(RecyclerItemClickListener(context, lvNearbyDevices, object : RecyclerItemClickListener.OnItemClickListener {
+                            override fun onItemClick(view: View?, position: Int) {
+                                val selectedDevice = adapterNearby.getDeviceAt(position)
+                                Log.d("Connecting", "Clicked on device '${selectedDevice.name}'")
+                                if(!viewModel.bluetoothService.connectToDevice(activity!!, selectedDevice)) {
+                                    Toast.makeText(context, "Connecting to device '${selectedDevice.name}' failed!",
+                                        Toast.LENGTH_LONG).show()
+                                    Log.d("Connecting", "Connecting to device '${selectedDevice.name}' failed")
+                                } else {
+                                    Toast.makeText(context, "Connecting to device '${selectedDevice.name}' succeeded!",
+                                        Toast.LENGTH_LONG).show()
+                                    Log.d("Connecting", "Connecting to device '${selectedDevice.name}' succeeded")
+                                }
+                            }
+        
+                            override fun onLongItemClick(view: View?, position: Int) {}
+                        }))
                     }
                 }, {
                     pullToRequestContainer.isRefreshing = false
@@ -103,6 +120,7 @@ class MainFragment : Fragment() {
     private fun showBluetoothDevices() {
         Toast.makeText(activity, "Bluetooth enabled", Toast.LENGTH_SHORT).show()
         viewModel.bluetoothService = BluetoothService(bluetoothAdapter!!)
+        viewModel.bluetoothService.setup()
         viewModel.nearbyDevices = MutableLiveData()
         viewModel.nearbyDevices.value = mutableListOf()
 
@@ -117,18 +135,51 @@ class MainFragment : Fragment() {
                     deviceList.add(RealBluetoothDevice(device))
                     val adapterNearby = BluetoothDeviceAdapter(this.context!!, deviceList)
                     lvNearbyDevices.adapter = adapterNearby
+                    lvNearbyDevices.addOnItemTouchListener(RecyclerItemClickListener(context, lvNearbyDevices, object : RecyclerItemClickListener.OnItemClickListener {
+                        override fun onItemClick(view: View?, position: Int) {
+                            val selectedDevice = adapterNearby.getDeviceAt(position)
+                            Log.d("Connecting", "Clicked on device '${selectedDevice.name}'")
+                            if(!viewModel.bluetoothService.connectToDevice(activity!!, selectedDevice)) {
+                                Toast.makeText(context, "Connecting to device '${selectedDevice.name}' failed!",
+                                    Toast.LENGTH_LONG).show()
+                                Log.d("Connecting", "Connecting to device '${selectedDevice.name}' failed")
+                            } else {
+                                Toast.makeText(context, "Connecting to device '${selectedDevice.name}' succeeded!",
+                                    Toast.LENGTH_LONG).show()
+                                Log.d("Connecting", "Connecting to device '${selectedDevice.name}' succeeded")
+                            }
+                        }
+        
+                        override fun onLongItemClick(view: View?, position: Int) {}
+                    }))
                 }
             }, {})
         })
 
         val adapterPaired = BluetoothDeviceAdapter(this.context!!, viewModel.getPairedDevices())
         lvPairedDevices.adapter = adapterPaired
+        lvPairedDevices.addOnItemTouchListener(RecyclerItemClickListener(context, lvPairedDevices, object : RecyclerItemClickListener.OnItemClickListener {
+            override fun onItemClick(view: View?, position: Int) {
+                val selectedDevice = adapterPaired.getDeviceAt(position)
+                Log.d("Connecting", "Clicked on device '${selectedDevice.name}'")
+                if(!viewModel.bluetoothService.connectToDevice(activity!!, selectedDevice)) {
+                    Toast.makeText(context, "Connecting to device '${selectedDevice.name}' failed!",
+                        Toast.LENGTH_LONG).show()
+                    Log.d("Connecting", "Connecting to device '${selectedDevice.name}' failed")
+                } else {
+                    Toast.makeText(context, "Connecting to device '${selectedDevice.name}' succeeded!",
+                        Toast.LENGTH_LONG).show()
+                    Log.d("Connecting", "Connecting to device '${selectedDevice.name}' succeeded")
+                }
+            }
+        
+            override fun onLongItemClick(view: View?, position: Int) {}
+        }))
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
-
+        
         if (requestCode == REQUEST_ENABLE_BLUETOOTH) {
             if (resultCode == Activity.RESULT_OK) {
                 if (bluetoothAdapter!!.isEnabled) {
@@ -141,5 +192,4 @@ class MainFragment : Fragment() {
             }
         }
     }
-
 }
