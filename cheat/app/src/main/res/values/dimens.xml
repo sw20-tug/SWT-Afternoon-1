@@ -10,6 +10,10 @@
     <dimen name="text_size_header">25sp</dimen>
     <dimen name="margin_timestamp">8dp</dimen>
     <dimen name="chat_item_min_width">100dp</dimen>
+    <dimen name="margin_send_btn">6dp</dimen>
+    <dimen name="size_send_btn">55dp</dimen>
+    <dimen name="padding_send_btn">14dp</dimen>
+
 
 
 </resources>
