@@ -16,9 +16,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import at.tugraz.ist.sw20.swta1.cheat.ChatActivity
 import at.tugraz.ist.sw20.swta1.cheat.R
 import at.tugraz.ist.sw20.swta1.cheat.RecyclerItemClickListener
 import at.tugraz.ist.sw20.swta1.cheat.bluetooth.BluetoothService
+import at.tugraz.ist.sw20.swta1.cheat.bluetooth.BluetoothState
 import at.tugraz.ist.sw20.swta1.cheat.bluetooth.RealBluetoothDevice
 import at.tugraz.ist.sw20.swta1.cheat.ui.main.adapters.BluetoothDeviceAdapter
 import kotlinx.android.synthetic.main.item_title_cell.view.*
@@ -115,11 +117,17 @@ class MainFragment : Fragment() {
         if (bluetoothAdapter != null && bluetoothAdapter!!.isEnabled) {
             showBluetoothDevices()
         }
+        viewModel.bluetoothService.setOnStateChangeListener { bluetoothState ->
+            if (bluetoothState == BluetoothState.CONNECTED) {
+                val intent = Intent(activity, ChatActivity::class.java)
+                context!!.startActivity(intent)
+            }
+        }
     }
 
     private fun showBluetoothDevices() {
         Toast.makeText(activity, "Bluetooth enabled", Toast.LENGTH_SHORT).show()
-        viewModel.bluetoothService = BluetoothService(bluetoothAdapter!!)
+        viewModel.bluetoothService = BluetoothService
         viewModel.bluetoothService.setup()
         viewModel.nearbyDevices = MutableLiveData()
         viewModel.nearbyDevices.value = mutableListOf()
