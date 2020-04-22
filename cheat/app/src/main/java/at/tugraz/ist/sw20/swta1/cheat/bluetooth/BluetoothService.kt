@@ -12,6 +12,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.util.Log
+import android.widget.Toast
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
@@ -28,6 +29,7 @@ class BluetoothService(private val adapter: BluetoothAdapter) {
     private var onMessageReceive: (ByteArray, Int) -> Any = { _: ByteArray, _: Int -> }
     
     val uuid = UUID.fromString("871dc78d-b4c1-4bf4-81f1-52af98e32350")
+    @Volatile
     var state: BluetoothState = BluetoothState.DISABLED
     
     fun getPairedDevices() : List<RealBluetoothDevice> {
@@ -44,7 +46,9 @@ class BluetoothService(private val adapter: BluetoothAdapter) {
     
     private fun updateState(state: BluetoothState) {
         Log.i(tag, "State changed to '$state', was '${this.state}'")
-        this.state = state
+        synchronized(this) {
+            this.state = state
+        }
         onStateChange(state)
     }
     
@@ -55,8 +59,12 @@ class BluetoothService(private val adapter: BluetoothAdapter) {
     }
     
     fun discoverDevices(activity: Activity, onDeviceFound: (BluetoothDevice) -> Unit, onDiscoveryStopped: () -> Unit) {
-        if(state != BluetoothState.READY && receiver != null) {
+        if(state != BluetoothState.READY) {
+            return
+        }
+        if(receiver != null) {
             activity.unregisterReceiver(receiver)
+            receiver = null
         }
         if (adapter.isDiscovering) {
             adapter.cancelDiscovery()
@@ -110,34 +118,38 @@ class BluetoothService(private val adapter: BluetoothAdapter) {
         Log.println(Log.DEBUG, tag, "Stop discovery")
         if (receiver != null) {
             activity.unregisterReceiver(receiver)
+            receiver = null
         }
     }
     
     fun connectToDevice(activity: Activity, device: IBluetoothDevice): Boolean {
         stopDiscovery(activity)
-        if (state != BluetoothState.READY) {
-            return false
-        }
-        //updateState(BluetoothState.CONNECTING)
         synchronized(this) {
+            if (state != BluetoothState.READY) {
+                return false
+            }
+            updateState(BluetoothState.ATTEMPT_CONNECTION)
             initConnection?.cancel()
             initConnection = InitConnection(device)
             initConnection!!.start()
         }
         return true
     }
-    
-    fun sendMessage(message: ByteArray) {
-        if (state != BluetoothState.CONNECTED || currentConnection == null) {
-            return
+
+    fun sendMessage(message: ByteArray) : Boolean {
+        synchronized(this) {
+            if (state != BluetoothState.CONNECTED || currentConnection == null) {
+                return false
+            }
         }
         
         try {
             currentConnection?.outStream?.write(message)
         } catch (e: IOException) {
             Log.e(connectionTag, "Error sending message", e)
-            // TODO disconnect
+            return false
         }
+        return true
     }
     
     @Synchronized
@@ -179,9 +191,11 @@ class BluetoothService(private val adapter: BluetoothAdapter) {
         
         override fun run() {
             Log.i(connectionTag, "Beginning connection")
-            if (this@BluetoothService.state != BluetoothState.READY) {
-                Log.e(connectionTag, "Unexpected state: " + this@BluetoothService.state)
-                return
+            synchronized(this@BluetoothService) {
+                if (this@BluetoothService.state != BluetoothState.ATTEMPT_CONNECTION) {
+                    Log.e(connectionTag, "Unexpected state: " + this@BluetoothService.state)
+                    return
+                }
             }
             if (targetSocket == null) {
                 Log.e(connectionTag, "Failed to create socket to " + target.name)
@@ -232,16 +246,18 @@ class BluetoothService(private val adapter: BluetoothAdapter) {
         
         override fun run() {
             Log.i(connectionTag, "Listening for incoming connections")
-            if (this@BluetoothService.state != BluetoothState.READY) {
-                Log.e(connectionTag, "Unexpected state: " + this@BluetoothService.state)
-                return
+            synchronized(this@BluetoothService) {
+                if (this@BluetoothService.state != BluetoothState.READY) {
+                    Log.e(connectionTag, "Unexpected state: " + this@BluetoothService.state)
+                    return
+                }
             }
             if (serverSocket == null) {
                 Log.e(connectionTag, "Failed to create server socket")
                 return
             }
             var clientSocket: BluetoothSocket? = null
-            
+
             while (this@BluetoothService.state == BluetoothState.READY) {
                 try {
                     clientSocket = serverSocket!!.accept()
@@ -254,19 +270,19 @@ class BluetoothService(private val adapter: BluetoothAdapter) {
                     var ready = true
                     synchronized(this@BluetoothService) {
                         if (this@BluetoothService.state != BluetoothState.READY) {
-                            Log.e(
-                                connectionTag,
-                                "State was not READY. (State: " + this@BluetoothService.state + ")"
-                            )
                             ready = false
                         } else {
                             acceptConnection = null
-                            updateState(BluetoothState.CONNECTING)
                         }
                     }
                     if (ready) {
+                        updateState(BluetoothState.CONNECTING)
                         connect(RealBluetoothDevice(clientSocket.remoteDevice), clientSocket)
                     } else {
+                        Log.e(
+                            connectionTag,
+                            "State was not READY. (State: " + this@BluetoothService.state + ")"
+                        )
                         try {
                             clientSocket.close()
                         } catch (e: IOException) {
@@ -321,7 +337,9 @@ class BluetoothService(private val adapter: BluetoothAdapter) {
                     onMessageReceive(buffer, bytesRead)
                 } catch (e: IOException) { // Close the socket
                     Log.e(connectionTag, "CurrentConnection error reading message", e)
-                    // TODO: disconnect
+                    synchronized(this@BluetoothService) {
+                        updateState(BluetoothState.READY)
+                    }
                 }
             }
             
