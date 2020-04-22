@@ -1,6 +1,7 @@
 package at.tugraz.ist.sw20.swta1.cheat.ui.chat
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import at.tugraz.ist.sw20.swta1.cheat.R
 import kotlinx.android.synthetic.main.chat_fragment.view.*
+import at.tugraz.ist.sw20.swta1.cheat.bluetooth.BluetoothService
 import java.util.Date
 
 class ChatFragment : Fragment() {
@@ -20,7 +22,6 @@ class ChatFragment : Fragment() {
     }
 
     private lateinit var viewModel: ChatViewModel
-
     private var chatEntries = mutableListOf<ChatEntry>() as ArrayList
 
     private lateinit var root: View
@@ -31,31 +32,15 @@ class ChatFragment : Fragment() {
                               savedInstanceState: Bundle?): View {
         root =  inflater.inflate(R.layout.chat_fragment, container, false)
 
-        // TODO Delete these entries once we get real entries from Backend
-        chatEntries = arrayListOf(
-            ChatEntry("Hey", true, Date()),
-            ChatEntry("Yo", false, Date()),
-            ChatEntry("Hey", true, Date()),
-            ChatEntry("Yo", false, Date()),
-            ChatEntry(
-                "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.",
-                true, Date()
-            ),
-            ChatEntry(
-                "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.",
-                false, Date()
-            ),
-            ChatEntry("Hey", true, Date()),
-            ChatEntry("Yo", false, Date()),
-            ChatEntry("Hey", true, Date()),
-            ChatEntry("Yo", false, Date()),
-            ChatEntry("Hey", true, Date()),
-            ChatEntry("Yo", false, Date()),
-            ChatEntry("Hey", true, Date()),
-            ChatEntry("Yo", true, Date()),
-            ChatEntry("Hey", true, Date()),
-            ChatEntry("Yo", false, Date())
-        )
+        BluetoothService.setOnMessageReceive { chatEntry ->
+            chatEntry.isByMe = false
+            Log.i("Message", "Message received: ${chatEntry.getMessage()}")
+            chatEntries.add(chatEntry)
+            activity!!.runOnUiThread {
+                chatAdapter.notifyDataSetChanged()
+                recyclerView.smoothScrollToPosition(chatEntries.size - 1)
+            }
+        }
 
         chatAdapter = ChatHistoryAdapter(
             chatEntries
@@ -86,7 +71,9 @@ class ChatFragment : Fragment() {
         btnSend.setOnClickListener {
             val text = etMsg.text.toString().trim()
             if (text.isNotBlank()) {
-                chatEntries.add(ChatEntry(text, true, Date()))
+                val chatEntry = ChatEntry(text, true, Date())
+                chatEntries.add(chatEntry)
+                BluetoothService.sendMessage(chatEntry)
                 chatAdapter.notifyDataSetChanged()
                 recyclerView.smoothScrollToPosition(chatEntries.size - 1)
                 etMsg.text.clear()
