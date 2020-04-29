@@ -15,11 +15,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import at.tugraz.ist.sw20.swta1.cheat.ChatActivity
 import at.tugraz.ist.sw20.swta1.cheat.R
-import kotlinx.android.synthetic.main.chat_fragment.view.*
 import at.tugraz.ist.sw20.swta1.cheat.bluetooth.BluetoothService
 import at.tugraz.ist.sw20.swta1.cheat.bluetooth.BluetoothState
-import org.w3c.dom.Text
-import java.util.Date
+import kotlinx.android.synthetic.main.chat_fragment.view.*
+import java.util.*
 
 class ChatFragment : Fragment() {
     companion object {
@@ -36,6 +35,9 @@ class ChatFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
         root =  inflater.inflate(R.layout.chat_fragment, container, false)
+
+        val header = root.item_header_text.findViewById<TextView>(R.id.title)
+        header.text = BluetoothService.getConnectedDevice()!!.name
 
         BluetoothService.setOnMessageReceive { chatEntry ->
             chatEntry.isByMe = false
