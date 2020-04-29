@@ -50,11 +50,15 @@ class ChatFragment : Fragment() {
         BluetoothService.setOnStateChangeListener { state ->
             val connection_status = root.findViewById<TextView>(R.id.connection_status)
 
-            when (state)
-            {
-                BluetoothState.CONNECTED -> connection_status.text = getString(R.string.connected_status)
-                BluetoothState.READY -> connection_status.text = getString(R.string.disconnected_status)
-                else -> {}
+            activity!!.runOnUiThread {
+                when (state) {
+                    BluetoothState.CONNECTED -> connection_status.text =
+                        getString(R.string.connected_status)
+                    BluetoothState.READY -> connection_status.text =
+                        getString(R.string.disconnected_status)
+                    else -> {
+                    }
+                }
             }
         }
 
