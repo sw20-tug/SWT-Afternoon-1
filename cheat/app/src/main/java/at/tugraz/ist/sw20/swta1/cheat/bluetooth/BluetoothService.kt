@@ -28,7 +28,7 @@ object BluetoothService {
     private var initConnection: InitConnection? = null
     private var acceptConnection: AcceptConnection? = null
     private var currentConnection: CurrentConnection? = null
-    private var onStateChange: (BluetoothState) -> Unit = {}
+    private var onStateChange: (BluetoothState, BluetoothState) -> Unit = {_, _ -> }
     private var onMessageReceive: (ChatEntry) -> Any = { chatEntry: ChatEntry -> Log.i(connectionTag, "Received message without listener: ${chatEntry.getMessage()}") }
     
     val uuid = UUID.fromString("871dc78d-b4c1-4bf4-81f1-52af98e32350")
@@ -39,7 +39,7 @@ object BluetoothService {
         return adapter.bondedDevices.map { device -> RealBluetoothDevice(device) }.toList()
     }
     
-    fun setOnStateChangeListener(onStateChange: (BluetoothState) -> Unit) {
+    fun setOnStateChangeListener(onStateChange: (odlState: BluetoothState, newState: BluetoothState) -> Unit) {
         this.onStateChange = onStateChange
     }
     
@@ -48,11 +48,15 @@ object BluetoothService {
     }
     
     private fun updateState(state: BluetoothState) {
-        Log.i(tag, "State changed to '$state', was '${this.state}'")
+        if(this.state == state)
+            return
+        
+        val oldState = this.state
+        Log.i(tag, "State changed from '$oldState' to '$state'")
         synchronized(this) {
             this.state = state
         }
-        onStateChange(state)
+        onStateChange(oldState, state)
     }
     
     fun setup() {
