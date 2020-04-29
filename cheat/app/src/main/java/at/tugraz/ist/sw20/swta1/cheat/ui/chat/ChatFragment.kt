@@ -35,7 +35,7 @@ class ChatFragment : Fragment() {
         root =  inflater.inflate(R.layout.chat_fragment, container, false)
 
         val header = root.item_header_text.findViewById<TextView>(R.id.title)
-        // header.text = device.name //TODO set name of device here
+        header.text = BluetoothService.getConnectedDevice()!!.name
 
         BluetoothService.setOnMessageReceive { chatEntry ->
             chatEntry.isByMe = false
