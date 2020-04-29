@@ -7,13 +7,14 @@
 
     <TextView
         android:id="@+id/title"
-        android:text="CHAT_PARTNER_NAME"
+        android:text="@string/chat_partner"
         android:textSize="@dimen/text_size_header"
         android:textColor="@color/primaryTextColor"
         android:padding="@dimen/margin_text_small"
         android:background="@color/primaryDarkHeaderColor"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toTopOf="@id/separator_bottom"/>
 
     <TextView
