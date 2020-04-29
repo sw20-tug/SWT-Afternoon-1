@@ -117,7 +117,7 @@ class MainFragment : Fragment() {
         if (bluetoothAdapter != null && bluetoothAdapter!!.isEnabled) {
             showBluetoothDevices()
         }
-        viewModel.bluetoothService.setOnStateChangeListener { bluetoothState ->
+        BluetoothService.setOnStateChangeListener { bluetoothState ->
             if (bluetoothState == BluetoothState.CONNECTED) {
                 val intent = Intent(activity, ChatActivity::class.java)
                 context!!.startActivity(intent)
