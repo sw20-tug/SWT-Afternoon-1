@@ -26,6 +26,8 @@ import at.tugraz.ist.sw20.swta1.cheat.bluetooth.IBluetoothDevice
 import at.tugraz.ist.sw20.swta1.cheat.bluetooth.RealBluetoothDevice
 import at.tugraz.ist.sw20.swta1.cheat.ui.main.adapters.BluetoothDeviceAdapter
 import kotlinx.android.synthetic.main.item_title_cell.view.*
+import java.util.*
+import kotlin.concurrent.schedule
 
 
 class MainFragment : Fragment() {
@@ -38,6 +40,7 @@ class MainFragment : Fragment() {
 
     lateinit var lvPairedDevices: RecyclerView
     lateinit var lvNearbyDevices: RecyclerView
+    lateinit var pullToRefreshContainer: SwipeRefreshLayout
 
     private val REQUEST_ENABLE_BLUETOOTH: Int = 1
     private var bluetoothAdapter: BluetoothAdapter? = null
@@ -75,8 +78,8 @@ class MainFragment : Fragment() {
         lvNearbyDevices.isNestedScrollingEnabled = false
         lvNearbyDevices.setHasFixedSize(true)
 
-        val pullToRequestContainer = root.findViewById<SwipeRefreshLayout>(R.id.pull_to_refresh_container)
-        pullToRequestContainer.setOnRefreshListener {
+        pullToRefreshContainer = root.findViewById<SwipeRefreshLayout>(R.id.pull_to_refresh_container)
+        pullToRefreshContainer.setOnRefreshListener {
             viewModel.nearbyDevices.observe(viewLifecycleOwner, Observer { deviceList ->
                 viewModel.bluetoothService.discoverDevices(activity!!, { device ->
                     if (deviceList.find { d -> d.address == device.address } == null) {
@@ -93,9 +96,13 @@ class MainFragment : Fragment() {
                         }))
                     }
                 }, {
-                    pullToRequestContainer.isRefreshing = false
+                    pullToRefreshContainer.isRefreshing = false
                 })
             })
+            
+            Timer().schedule(10000) {
+                pullToRefreshContainer.isRefreshing = false
+            }
         }
         
         return root
@@ -176,6 +183,8 @@ class MainFragment : Fragment() {
     }
     
     private fun connectToSelectedDevice(activity: Activity, device: IBluetoothDevice) {
+        pullToRefreshContainer.isRefreshing = false
+        
         Log.d("Connecting", "Clicked on device '${device.name}'")
         if(!viewModel.bluetoothService.connectToDevice(activity, device)) {
             Toast.makeText(context, "Connecting to device '${device.name}' failed!",

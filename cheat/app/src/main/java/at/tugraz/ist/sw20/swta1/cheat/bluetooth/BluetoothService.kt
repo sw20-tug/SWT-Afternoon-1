@@ -48,14 +48,16 @@ object BluetoothService {
     }
     
     private fun updateState(state: BluetoothState) {
-        if(this.state == state)
-            return
-        
-        val oldState = this.state
-        Log.i(tag, "State changed from '$oldState' to '$state'")
+        var oldState: BluetoothState
         synchronized(this) {
+            if(this.state == state)
+                return
+            
+            oldState = this.state
             this.state = state
         }
+        
+        Log.i(tag, "State changed from '$oldState' to '$state'")
         onStateChange(oldState, state)
     }
     
@@ -135,11 +137,12 @@ object BluetoothService {
             if (state != BluetoothState.READY) {
                 return false
             }
-            updateState(BluetoothState.ATTEMPT_CONNECTION)
-            initConnection?.cancel()
-            initConnection = InitConnection(device)
-            initConnection!!.start()
         }
+        
+        updateState(BluetoothState.ATTEMPT_CONNECTION)
+        initConnection?.cancel()
+        initConnection = InitConnection(device)
+        initConnection!!.start()
         return true
     }
     
@@ -211,6 +214,7 @@ object BluetoothService {
             try {
                 targetSocket!!.connect()
             } catch (e: IOException) { // Close the socket
+                updateState(BluetoothState.READY)
                 Log.e(connectionTag, "Failed to connect, closing socket")
                 try {
                     targetSocket!!.close()
@@ -348,9 +352,7 @@ object BluetoothService {
                     onMessageReceive(chatEntry)
                 } catch (e: IOException) { // Close the socket
                     Log.e(connectionTag, "CurrentConnection error reading message", e)
-                    synchronized(BluetoothService) {
-                        updateState(BluetoothState.READY)
-                    }
+                    updateState(BluetoothState.READY)
                 }
             }
             
