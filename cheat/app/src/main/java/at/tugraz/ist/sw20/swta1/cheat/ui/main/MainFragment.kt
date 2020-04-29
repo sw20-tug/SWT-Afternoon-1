@@ -95,7 +95,7 @@ class MainFragment : Fragment() {
                             override fun onItemClick(view: View?, position: Int) {
                                 connectToSelectedDevice(activity!!,
                                     adapterNearby.getDeviceAt(position),
-                                    lvNearbyDevices.get(position).findViewById<ProgressBar>(R.id.loading_spinner))
+                                    lvNearbyDevices[position].findViewById<ProgressBar>(R.id.loading_spinner))
                             }
         
                             override fun onLongItemClick(view: View?, position: Int) {}
@@ -129,8 +129,16 @@ class MainFragment : Fragment() {
                 val intent = Intent(activity, MainActivity::class.java)
                 context!!.startActivity(intent)
             } else if (oldState == BluetoothState.ATTEMPT_CONNECTION && newState == BluetoothState.READY) {
-                currentConnectingIndicator?.visibility = View.GONE
-                currentConnectingIndicator = null
+                synchronized(this) {
+                    activity!!.runOnUiThread {
+                        currentConnectingIndicator?.visibility = View.GONE
+                        currentConnectingIndicator = null
+                    }
+                }
+    
+                activity!!.runOnUiThread {
+                    Toast.makeText(context, "Connecting failed", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
@@ -156,7 +164,7 @@ class MainFragment : Fragment() {
                         override fun onItemClick(view: View?, position: Int) {
                             connectToSelectedDevice(activity!!,
                                 adapterNearby.getDeviceAt(position),
-                                lvNearbyDevices.get(position).findViewById<ProgressBar>(R.id.loading_spinner))
+                                lvNearbyDevices[position].findViewById<ProgressBar>(R.id.loading_spinner))
                         }
         
                         override fun onLongItemClick(view: View?, position: Int) {}
@@ -170,7 +178,7 @@ class MainFragment : Fragment() {
         lvPairedDevices.addOnItemTouchListener(RecyclerItemClickListener(context, lvPairedDevices, object : RecyclerItemClickListener.OnItemClickListener {
             override fun onItemClick(view: View?, position: Int) {
                 connectToSelectedDevice(activity!!, adapterPaired.getDeviceAt(position),
-                    lvPairedDevices.get(position).findViewById<ProgressBar>(R.id.loading_spinner))
+                    lvPairedDevices[position].findViewById<ProgressBar>(R.id.loading_spinner))
             }
         
             override fun onLongItemClick(view: View?, position: Int) {}
@@ -195,9 +203,11 @@ class MainFragment : Fragment() {
     }
     
     private fun connectToSelectedDevice(activity: Activity, device: IBluetoothDevice, loadingIndicator: ProgressBar) {
-        if (currentConnectingIndicator == null) {
-            loadingIndicator.visibility = View.VISIBLE
-            currentConnectingIndicator = loadingIndicator
+        synchronized(this) {
+            if (currentConnectingIndicator == null) {
+                loadingIndicator.visibility = View.VISIBLE
+                currentConnectingIndicator = loadingIndicator
+            }
         }
 
         pullToRefreshContainer.isRefreshing = false
@@ -206,13 +216,13 @@ class MainFragment : Fragment() {
         if(!viewModel.bluetoothService.connectToDevice(activity, device)) {
             Toast.makeText(context, "Connecting to device '${device.name}' failed!",
                 Toast.LENGTH_LONG).show()
-            Log.d("Connecting", "Connecting to device '${device.name}' failed")
-            currentConnectingIndicator = null
-            loadingIndicator.visibility = View.GONE
+            Log.e("Connecting", "Connecting to device '${device.name}' failed")
+            synchronized(this) {
+                currentConnectingIndicator = null
+                loadingIndicator.visibility = View.GONE
+            }
         } else {
-            Toast.makeText(context, "Connecting to device '${device.name}' succeeded!",
-                Toast.LENGTH_LONG).show()
-            Log.d("Connecting", "Connecting to device '${device.name}' succeeded")
+            Log.i("Connecting", "Initialising connection to device '${device.name}' succeeded")
         }
     }
 }
