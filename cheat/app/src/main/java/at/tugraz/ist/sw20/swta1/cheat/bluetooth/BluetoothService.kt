@@ -110,6 +110,7 @@ object BluetoothService {
         Log.println(Log.DEBUG, tag, "Stop discovery")
         if (receiver != null) {
             activity.unregisterReceiver(receiver)
+            receiver = null
         }
     }
     

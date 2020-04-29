@@ -22,6 +22,9 @@ class ChatActivity : AppCompatActivity() {
         }
 
         supportActionBar?.hide()
+
+        val chatEntry = ChatEntry("Chat partner joined.", true, true, Date())
+        BluetoothService.sendMessage(chatEntry)
     }
 
     override fun onBackPressed() {
