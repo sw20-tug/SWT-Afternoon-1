@@ -4,7 +4,7 @@ import java.io.Serializable
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ChatEntry(private val message: String, var isByMe: Boolean,
+class ChatEntry(private val message: String, var isByMe: Boolean, var isBySystem: Boolean,
                 private val timestamp: Date) : Serializable {
 
     fun getFormattedTimestamp(): String {
@@ -18,5 +18,9 @@ class ChatEntry(private val message: String, var isByMe: Boolean,
 
     fun isWrittenByMe(): Boolean {
         return isByMe
+    }
+
+    fun isSystemMessage(): Boolean {
+        return isBySystem
     }
 }

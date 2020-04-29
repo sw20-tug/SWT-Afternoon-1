@@ -114,32 +114,43 @@ class MainFragment : Fragment() {
         return root
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-        // TODO: Use the ViewModel
-        if (bluetoothAdapter != null && bluetoothAdapter!!.isEnabled) {
-            showBluetoothDevices()
+    override fun onResume() {
+        super.onResume()
+    
+        synchronized(this) {
+            activity!!.runOnUiThread {
+                currentConnectingIndicator?.visibility = View.GONE
+                currentConnectingIndicator = null
+            }
         }
-        viewModel.bluetoothService.setOnStateChangeListener { oldState, newState ->
+        
+        BluetoothService.setOnStateChangeListener { oldState, newState ->
             if (newState == BluetoothState.CONNECTED) {
                 val intent = Intent(activity, ChatActivity::class.java)
                 context!!.startActivity(intent)
-            } else if(oldState == BluetoothState.CONNECTED && newState == BluetoothState.READY) {
-                val intent = Intent(activity, MainActivity::class.java)
-                context!!.startActivity(intent)
-            } else if (oldState == BluetoothState.ATTEMPT_CONNECTION && newState == BluetoothState.READY) {
+            } else if(newState == BluetoothState.READY) {
                 synchronized(this) {
                     activity!!.runOnUiThread {
                         currentConnectingIndicator?.visibility = View.GONE
                         currentConnectingIndicator = null
                     }
                 }
-    
-                activity!!.runOnUiThread {
-                    Toast.makeText(context, "Connecting failed", Toast.LENGTH_SHORT).show()
+                
+                if(oldState == BluetoothState.ATTEMPT_CONNECTION) {
+                    activity!!.runOnUiThread {
+                        Toast.makeText(context, "Connecting failed", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
+        }
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+        // TODO: Use the ViewModel
+        if (bluetoothAdapter != null && bluetoothAdapter!!.isEnabled) {
+            showBluetoothDevices()
         }
     }
 

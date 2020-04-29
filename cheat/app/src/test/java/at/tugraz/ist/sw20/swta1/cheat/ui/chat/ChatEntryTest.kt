@@ -8,7 +8,7 @@ import java.util.*
 
 internal class ChatEntryTest {
 
-    private val entry: ChatEntry = ChatEntry("Hi this is a message", true, Date())
+    private val entry: ChatEntry = ChatEntry("Hi this is a message", true, false, Date())
 
     @Test
     fun getFormattedTimestamp() {

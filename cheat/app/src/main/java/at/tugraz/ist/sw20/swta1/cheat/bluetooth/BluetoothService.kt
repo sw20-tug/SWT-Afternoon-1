@@ -157,6 +157,7 @@ object BluetoothService {
             currentConnection?.objectOutStream?.writeObject(message)
         } catch (e: IOException) {
             Log.e(connectionTag, "Error sending message", e)
+            disconnect()
             return false
         }
         return true
@@ -184,6 +185,42 @@ object BluetoothService {
         Log.i(connectionTag, "Connecting to " + device.name + "...")
         currentConnection = CurrentConnection(device, socket)
         currentConnection?.start()
+    }
+
+    @Synchronized
+    fun disconnect() {
+        if (state != BluetoothState.CONNECTED)
+        {
+            Log.i(connectionTag, "Already disconnected...")
+            return
+        }
+        Log.i(connectionTag, "Disconnecting from " + currentConnection!!.getDevice().name + " ...")
+
+        if (initConnection != null) {
+            initConnection?.cancel()
+            initConnection = null
+        }
+
+        if (acceptConnection != null) {
+            acceptConnection?.cancel()
+            acceptConnection = null
+        }
+
+        if (currentConnection != null) {
+            currentConnection?.cancel()
+            currentConnection = null
+        }
+
+        setup()
+    }
+
+    @Synchronized
+    fun getConnectedDevice () : IBluetoothDevice? {
+        return if (state == BluetoothState.CONNECTED && currentConnection != null) {
+            currentConnection!!.getDevice()
+        } else {
+            null
+        }
     }
     
     class InitConnection(private val target: IBluetoothDevice) : Thread() {
@@ -339,6 +376,10 @@ object BluetoothService {
                 updateState(BluetoothState.READY)
             }
         }
+
+        fun getDevice() : IBluetoothDevice {
+            return device
+        }
         
         override fun run() {
             Log.i(connectionTag, "Connection to ${device.name} established, ready to send/receive")
@@ -352,6 +393,7 @@ object BluetoothService {
                     onMessageReceive(chatEntry)
                 } catch (e: IOException) { // Close the socket
                     Log.e(connectionTag, "CurrentConnection error reading message", e)
+                    disconnect()
                     updateState(BluetoothState.READY)
                 }
             }
