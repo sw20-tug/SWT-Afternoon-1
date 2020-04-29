@@ -165,7 +165,7 @@ object BluetoothService {
     }
 
     @Synchronized
-    private fun disconnect() {
+    fun disconnect() {
         if (state != BluetoothState.CONNECTED)
         {
             Log.i(connectionTag, "Already disconnected...")
@@ -192,7 +192,7 @@ object BluetoothService {
     }
 
     @Synchronized
-    public fun getConnectedDevice () : IBluetoothDevice? {
+    fun getConnectedDevice () : IBluetoothDevice? {
         return if (state == BluetoothState.CONNECTED && currentConnection != null) {
             currentConnection!!.getDevice()
         } else {

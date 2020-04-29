@@ -26,6 +26,10 @@ class ChatHistoryAdapter(private val dataSource: ArrayList<ChatEntry>) : Recycle
         if(dataSource[position].isWrittenByMe()) {
             layout = R.layout.item_chat_message_by_me
         }
+        else if(dataSource[position].isSystemMessage())
+        {
+            layout = R.layout.item_chat_message_by_system
+        }
         return layout
     }
 
