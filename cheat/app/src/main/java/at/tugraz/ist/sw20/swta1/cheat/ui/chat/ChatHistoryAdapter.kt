@@ -23,9 +23,14 @@ class ChatHistoryAdapter(private val dataSource: ArrayList<ChatEntry>) : Recycle
 
     override fun getItemViewType(position: Int): Int {
         var layout = R.layout.item_chat_message_by_other
-        if(dataSource[position].isWrittenByMe()) {
+        if(dataSource[position].isSystemMessage())
+        {
+            layout = R.layout.item_chat_message_by_system
+        }
+        else if(dataSource[position].isWrittenByMe()) {
             layout = R.layout.item_chat_message_by_me
         }
+
         return layout
     }
 

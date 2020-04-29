@@ -8,15 +8,17 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import at.tugraz.ist.sw20.swta1.cheat.ChatActivity
 import at.tugraz.ist.sw20.swta1.cheat.R
-import kotlinx.android.synthetic.main.chat_fragment.view.*
 import at.tugraz.ist.sw20.swta1.cheat.bluetooth.BluetoothService
-import kotlinx.android.synthetic.main.item_text.*
-import java.util.Date
+import at.tugraz.ist.sw20.swta1.cheat.bluetooth.BluetoothState
+import kotlinx.android.synthetic.main.chat_fragment.view.*
+import java.util.*
 
 class ChatFragment : Fragment() {
     companion object {
@@ -47,6 +49,21 @@ class ChatFragment : Fragment() {
             }
         }
 
+        BluetoothService.setOnStateChangeListener { state ->
+            val connection_status = root.findViewById<TextView>(R.id.connection_status)
+
+            activity!!.runOnUiThread {
+                when (state) {
+                    BluetoothState.CONNECTED -> connection_status.text =
+                        getString(R.string.connected_status)
+                    BluetoothState.READY -> connection_status.text =
+                        getString(R.string.disconnected_status)
+                    else -> {
+                    }
+                }
+            }
+        }
+
         chatAdapter = ChatHistoryAdapter(
             chatEntries
         )
@@ -59,6 +76,7 @@ class ChatFragment : Fragment() {
         (recyclerView.layoutManager as LinearLayoutManager).stackFromEnd = true
 
         initSendButton()
+        initConnectionButton()
 
         return root
     }
@@ -69,14 +87,27 @@ class ChatFragment : Fragment() {
         // TODO: Use the ViewModel
     }
 
+    private fun initConnectionButton() {
+        val connection_status = root.findViewById<TextView>(R.id.connection_status)
+        connection_status.setOnClickListener {
+            if(BluetoothService.state == BluetoothState.CONNECTED) {
+                (activity as ChatActivity).disconnect()
+            }
+        }
+    }
+
     private fun initSendButton() {
         val btnSend = root.item_text_entry_field.findViewById<Button>(R.id.btn_send)
         val etMsg = root.item_text_entry_field.findViewById<EditText>(R.id.text_entry)
 
         btnSend.setOnClickListener {
             val text = etMsg.text.toString().trim()
-            if (text.isNotBlank()) {
-                val chatEntry = ChatEntry(text, true, Date())
+            if (BluetoothService.state != BluetoothState.CONNECTED)
+            {
+                Toast.makeText(context, "Can't sent message while disconnected.", Toast.LENGTH_SHORT).show()
+            }
+            else if (text.isNotBlank()) {
+                val chatEntry = ChatEntry(text, true, false, Date())
                 chatEntries.add(chatEntry)
                 BluetoothService.sendMessage(chatEntry)
                 chatAdapter.notifyDataSetChanged()

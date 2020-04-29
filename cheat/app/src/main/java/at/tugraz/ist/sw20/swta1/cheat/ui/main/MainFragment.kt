@@ -106,8 +106,18 @@ class MainFragment : Fragment() {
             })
         }
 
-
         return root
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        BluetoothService.setOnStateChangeListener { bluetoothState ->
+            if (bluetoothState == BluetoothState.CONNECTED) {
+                val intent = Intent(activity, ChatActivity::class.java)
+                context!!.startActivity(intent)
+            }
+        }
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -116,12 +126,6 @@ class MainFragment : Fragment() {
         // TODO: Use the ViewModel
         if (bluetoothAdapter != null && bluetoothAdapter!!.isEnabled) {
             showBluetoothDevices()
-        }
-        BluetoothService.setOnStateChangeListener { bluetoothState ->
-            if (bluetoothState == BluetoothState.CONNECTED) {
-                val intent = Intent(activity, ChatActivity::class.java)
-                context!!.startActivity(intent)
-            }
         }
     }
 

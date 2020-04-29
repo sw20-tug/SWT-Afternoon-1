@@ -110,6 +110,7 @@ object BluetoothService {
         Log.println(Log.DEBUG, tag, "Stop discovery")
         if (receiver != null) {
             activity.unregisterReceiver(receiver)
+            receiver = null
         }
     }
     
@@ -136,7 +137,7 @@ object BluetoothService {
             currentConnection?.objectOutStream?.writeObject(message)
         } catch (e: IOException) {
             Log.e(connectionTag, "Error sending message", e)
-            // TODO disconnect
+            disconnect()
         }
     }
     
@@ -165,12 +166,13 @@ object BluetoothService {
     }
 
     @Synchronized
-    private fun disconnect() {
+    fun disconnect() {
         if (state != BluetoothState.CONNECTED)
         {
             Log.i(connectionTag, "Already disconnected...")
             return
         }
+        Log.i(connectionTag, "Disconnecting from " + currentConnection!!.getDevice().name + " ...")
 
         if (initConnection != null) {
             initConnection?.cancel()
@@ -187,12 +189,11 @@ object BluetoothService {
             currentConnection = null
         }
 
-        Log.i(connectionTag, "Disconnecting from " + currentConnection!!.getDevice().name + " ...")
         setup()
     }
 
     @Synchronized
-    public fun getConnectedDevice () : IBluetoothDevice? {
+    fun getConnectedDevice () : IBluetoothDevice? {
         return if (state == BluetoothState.CONNECTED && currentConnection != null) {
             currentConnection!!.getDevice()
         } else {
@@ -365,7 +366,7 @@ object BluetoothService {
                     onMessageReceive(chatEntry)
                 } catch (e: IOException) { // Close the socket
                     Log.e(connectionTag, "CurrentConnection error reading message", e)
-                    // TODO: disconnect
+                    disconnect()
                 }
             }
             
