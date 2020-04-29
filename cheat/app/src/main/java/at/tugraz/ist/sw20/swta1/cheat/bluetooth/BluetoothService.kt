@@ -171,6 +171,7 @@ object BluetoothService {
             Log.i(connectionTag, "Already disconnected...")
             return
         }
+        Log.i(connectionTag, "Disconnecting from " + currentConnection!!.getDevice().name + " ...")
 
         if (initConnection != null) {
             initConnection?.cancel()
@@ -187,7 +188,6 @@ object BluetoothService {
             currentConnection = null
         }
 
-        Log.i(connectionTag, "Disconnecting from " + currentConnection!!.getDevice().name + " ...")
         setup()
     }
 
