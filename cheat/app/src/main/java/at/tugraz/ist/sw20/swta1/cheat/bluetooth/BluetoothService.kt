@@ -163,6 +163,42 @@ object BluetoothService {
         currentConnection = CurrentConnection(device, socket)
         currentConnection?.start()
     }
+
+    @Synchronized
+    private fun disconnect() {
+        if (state != BluetoothState.CONNECTED)
+        {
+            Log.i(connectionTag, "Already disconnected...")
+            return
+        }
+
+        if (initConnection != null) {
+            initConnection?.cancel()
+            initConnection = null
+        }
+
+        if (acceptConnection != null) {
+            acceptConnection?.cancel()
+            acceptConnection = null
+        }
+
+        if (currentConnection != null) {
+            currentConnection?.cancel()
+            currentConnection = null
+        }
+
+        Log.i(connectionTag, "Disconnecting from " + currentConnection!!.getDevice().name + " ...")
+        setup()
+    }
+
+    @Synchronized
+    public fun getConnectedDevice () : IBluetoothDevice? {
+        return if (state == BluetoothState.CONNECTED && currentConnection != null) {
+            currentConnection!!.getDevice()
+        } else {
+            null
+        }
+    }
     
     class InitConnection(private val target: IBluetoothDevice) : Thread() {
         private var targetSocket: BluetoothSocket?
@@ -311,6 +347,10 @@ object BluetoothService {
                 cancel()
                 updateState(BluetoothState.READY)
             }
+        }
+
+        fun getDevice() : IBluetoothDevice {
+            return device
         }
         
         override fun run() {
