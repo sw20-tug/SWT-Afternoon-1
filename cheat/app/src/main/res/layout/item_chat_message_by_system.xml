@@ -28,7 +28,7 @@
         <TextView
             android:id="@+id/chat_timestamp"
             android:text="13:35"
-            android:gravity="end"
+            android:gravity="center"
             android:textSize="@dimen/text_size_small"
             android:textColor="@color/primaryTextColor"
             android:layout_width="match_parent"
