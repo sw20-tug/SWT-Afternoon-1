@@ -34,5 +34,9 @@ class ChatHistoryAdapter(private val dataSource: ArrayList<ChatEntry>) : Recycle
         return layout
     }
 
+    fun getItemAt(position: Int) : ChatEntry {
+        return dataSource[position]
+    }
+
     override fun getItemCount() = dataSource.size
 }

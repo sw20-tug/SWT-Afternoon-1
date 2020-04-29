@@ -4,8 +4,8 @@ import java.io.Serializable
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ChatEntry(private val message: String, var isByMe: Boolean, var isBySystem: Boolean,
-                private val timestamp: Date) : Serializable {
+class ChatEntry(private var message: String, var isByMe: Boolean, var isBySystem: Boolean,
+                private val timestamp: Date, private val id : UUID = UUID.randomUUID()) : Serializable {
 
     fun getFormattedTimestamp(): String {
         val df = SimpleDateFormat("HH:mm", Locale.US)
@@ -16,11 +16,19 @@ class ChatEntry(private val message: String, var isByMe: Boolean, var isBySystem
         return message
     }
 
+    fun getId(): UUID {
+        return id
+    }
+
     fun isWrittenByMe(): Boolean {
         return isByMe
     }
 
     fun isSystemMessage(): Boolean {
         return isBySystem
+    }
+
+    fun setDeleted() {
+        message = "deleted"
     }
 }

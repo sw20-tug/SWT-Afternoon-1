@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import at.tugraz.ist.sw20.swta1.cheat.ChatActivity
 import at.tugraz.ist.sw20.swta1.cheat.R
+import at.tugraz.ist.sw20.swta1.cheat.RecyclerItemClickListener
 import at.tugraz.ist.sw20.swta1.cheat.bluetooth.BluetoothService
 import at.tugraz.ist.sw20.swta1.cheat.bluetooth.BluetoothState
 import kotlinx.android.synthetic.main.chat_fragment.view.*
@@ -42,10 +43,18 @@ class ChatFragment : Fragment() {
         BluetoothService.setOnMessageReceive { chatEntry ->
             chatEntry.isByMe = false
             Log.i("Message", "Message received: ${chatEntry.getMessage()}")
-            chatEntries.add(chatEntry)
-            activity!!.runOnUiThread {
-                chatAdapter.notifyDataSetChanged()
-                recyclerView.smoothScrollToPosition(chatEntries.size - 1)
+            val oldMessageIndex = chatEntries.indexOfFirst { entry -> entry.getId() == chatEntry.getId()}
+            if(oldMessageIndex == -1) {
+                chatEntries.add(chatEntry)
+                activity!!.runOnUiThread {
+                    chatAdapter.notifyDataSetChanged()
+                    recyclerView.smoothScrollToPosition(chatEntries.size - 1)
+                }
+            } else {
+                chatEntries.set(oldMessageIndex, chatEntry)
+                activity!!.runOnUiThread {
+                    chatAdapter.notifyDataSetChanged()
+                }
             }
         }
 
@@ -72,6 +81,17 @@ class ChatFragment : Fragment() {
             layoutManager = LinearLayoutManager(context!!)
             adapter = chatAdapter
         }
+        recyclerView.addOnItemTouchListener(RecyclerItemClickListener(context, recyclerView, object : RecyclerItemClickListener.OnItemClickListener{
+            override fun onItemClick(view: View?, position: Int) {
+            }
+
+            override fun onLongItemClick(view: View?, position: Int) {
+                val message = chatAdapter.getItemAt(position)
+                message.setDeleted()
+                chatAdapter.notifyDataSetChanged()
+                BluetoothService.sendMessage(message)
+            }
+        }))
 
         (recyclerView.layoutManager as LinearLayoutManager).stackFromEnd = true
 

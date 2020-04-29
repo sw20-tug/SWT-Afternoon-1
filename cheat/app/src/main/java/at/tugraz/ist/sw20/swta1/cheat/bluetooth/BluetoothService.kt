@@ -140,6 +140,8 @@ object BluetoothService {
             disconnect()
         }
     }
+
+
     
     @Synchronized
     private fun connect(device: IBluetoothDevice, socket: BluetoothSocket) {
