@@ -136,7 +136,7 @@ object BluetoothService {
             currentConnection?.objectOutStream?.writeObject(message)
         } catch (e: IOException) {
             Log.e(connectionTag, "Error sending message", e)
-            // TODO disconnect
+            disconnect()
         }
     }
     
@@ -365,7 +365,7 @@ object BluetoothService {
                     onMessageReceive(chatEntry)
                 } catch (e: IOException) { // Close the socket
                     Log.e(connectionTag, "CurrentConnection error reading message", e)
-                    // TODO: disconnect
+                    disconnect()
                 }
             }
             

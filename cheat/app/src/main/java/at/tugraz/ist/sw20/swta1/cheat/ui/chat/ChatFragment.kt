@@ -71,7 +71,7 @@ class ChatFragment : Fragment() {
         btnSend.setOnClickListener {
             val text = etMsg.text.toString().trim()
             if (text.isNotBlank()) {
-                val chatEntry = ChatEntry(text, true, Date())
+                val chatEntry = ChatEntry(text, true, false, Date())
                 chatEntries.add(chatEntry)
                 BluetoothService.sendMessage(chatEntry)
                 chatAdapter.notifyDataSetChanged()
