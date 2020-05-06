@@ -27,7 +27,6 @@ class ChatFragment : Fragment() {
     }
 
     private lateinit var viewModel: ChatViewModel
-    private var chatEntries = mutableListOf<ChatEntry>() as ArrayList
 
     private lateinit var root: View
     private lateinit var chatAdapter: ChatHistoryAdapter
@@ -43,17 +42,11 @@ class ChatFragment : Fragment() {
         BluetoothService.setOnMessageReceive { chatEntry ->
             chatEntry.isByMe = false
             Log.i("Message", "Message received: ${chatEntry.getMessage()}")
-            val oldMessageIndex = chatEntries.indexOfFirst { entry -> entry.getId() == chatEntry.getId()}
-            if(oldMessageIndex == -1) {
-                chatEntries.add(chatEntry)
-                activity!!.runOnUiThread {
-                    chatAdapter.notifyDataSetChanged()
-                    recyclerView.smoothScrollToPosition(chatEntries.size - 1)
-                }
-            } else {
-                chatEntries.set(oldMessageIndex, chatEntry)
-                activity!!.runOnUiThread {
-                    chatAdapter.notifyDataSetChanged()
+            val scrollPosition = viewModel.insertMessage(chatEntry)
+            activity!!.runOnUiThread {
+                chatAdapter.notifyDataSetChanged()
+                if (scrollPosition > -1) {
+                    recyclerView.smoothScrollToPosition(scrollPosition)
                 }
             }
         }
@@ -73,23 +66,26 @@ class ChatFragment : Fragment() {
             }
         }
 
-        chatAdapter = ChatHistoryAdapter(
-            chatEntries
-        )
+        chatAdapter = ChatHistoryAdapter(viewModel.getChatEntries())
 
         recyclerView = root.findViewById<RecyclerView>(R.id.chat_history).apply {
             layoutManager = LinearLayoutManager(context!!)
             adapter = chatAdapter
         }
-        recyclerView.addOnItemTouchListener(RecyclerItemClickListener(context, recyclerView, object : RecyclerItemClickListener.OnItemClickListener{
+
+        recyclerView.addOnItemTouchListener(RecyclerItemClickListener(context, recyclerView,
+            object : RecyclerItemClickListener.OnItemClickListener{
+
             override fun onItemClick(view: View?, position: Int) {
             }
 
             override fun onLongItemClick(view: View?, position: Int) {
                 val message = chatAdapter.getItemAt(position)
-                message.setDeleted()
-                chatAdapter.notifyDataSetChanged()
-                BluetoothService.sendMessage(message)
+                if (message.isByMe) {
+                    message.setDeleted()
+                    chatAdapter.notifyDataSetChanged()
+                    BluetoothService.sendMessage(message)
+                }
             }
         }))
 
@@ -104,7 +100,6 @@ class ChatFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProvider(this).get(ChatViewModel::class.java)
-        // TODO: Use the ViewModel
     }
 
     private fun initConnectionButton() {
@@ -128,10 +123,10 @@ class ChatFragment : Fragment() {
             }
             else if (text.isNotBlank()) {
                 val chatEntry = ChatEntry(text, true, false, Date())
-                chatEntries.add(chatEntry)
+                val scrollPosition = viewModel.insertMessage(chatEntry)
                 BluetoothService.sendMessage(chatEntry)
                 chatAdapter.notifyDataSetChanged()
-                recyclerView.smoothScrollToPosition(chatEntries.size - 1)
+                recyclerView.smoothScrollToPosition(scrollPosition)
                 etMsg.text.clear()
             }
         }

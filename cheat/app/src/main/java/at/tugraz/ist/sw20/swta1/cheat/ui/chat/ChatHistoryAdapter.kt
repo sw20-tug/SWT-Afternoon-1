@@ -1,5 +1,6 @@
 package at.tugraz.ist.sw20.swta1.cheat.ui.chat
 
+import android.graphics.Typeface
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,8 +18,13 @@ class ChatHistoryAdapter(private val dataSource: ArrayList<ChatEntry>) : Recycle
     }
 
     override fun onBindViewHolder(holder: ChatViewHolder, position: Int) {
-        holder.view.findViewById<TextView>(R.id.chat_message).text = dataSource[position].getMessage()
-        holder.view.findViewById<TextView>(R.id.chat_timestamp).text = dataSource[position].getFormattedTimestamp()
+        val chatEntry = dataSource[position]
+        val tvMessage = holder.view.findViewById<TextView>(R.id.chat_message)
+        tvMessage.text = chatEntry.getMessage()
+        if (chatEntry.isDeleted()) {
+            tvMessage.setTypeface(null, Typeface.ITALIC);
+        }
+        holder.view.findViewById<TextView>(R.id.chat_timestamp).text = chatEntry.getFormattedTimestamp()
     }
 
     override fun getItemViewType(position: Int): Int {
