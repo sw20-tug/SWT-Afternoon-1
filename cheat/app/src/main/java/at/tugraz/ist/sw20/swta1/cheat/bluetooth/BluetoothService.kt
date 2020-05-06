@@ -161,7 +161,8 @@ object BluetoothService {
         }
         
         try {
-            currentConnection?.objectOutStream?.writeObject(message)
+            // Cloning message here to avoid a bug when serializing a message more than once
+            currentConnection?.objectOutStream?.writeObject(message.clone())
         } catch (e: IOException) {
             Log.e(connectionTag, "Error sending message", e)
             disconnect()
@@ -169,6 +170,8 @@ object BluetoothService {
         }
         return true
     }
+
+
     
     @Synchronized
     private fun connect(device: IBluetoothDevice, socket: BluetoothSocket) {

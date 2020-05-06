@@ -106,12 +106,12 @@ class MainFragment : Fragment() {
                     pullToRefreshContainer.isRefreshing = false
                 })
             })
-            
+
             Timer().schedule(10000) {
                 pullToRefreshContainer.isRefreshing = false
             }
         }
-        
+
         return root
     }
 
@@ -124,7 +124,7 @@ class MainFragment : Fragment() {
                 currentConnectingIndicator = null
             }
         }
-        
+
         BluetoothService.setOnStateChangeListener { oldState, newState ->
             if (newState == BluetoothState.CONNECTED) {
                 val intent = Intent(activity, ChatActivity::class.java)
@@ -136,7 +136,7 @@ class MainFragment : Fragment() {
                         currentConnectingIndicator = null
                     }
                 }
-                
+
                 if(oldState == BluetoothState.ATTEMPT_CONNECTION) {
                     activity!!.runOnUiThread {
                         Toast.makeText(context, "Connecting failed", Toast.LENGTH_SHORT).show()
@@ -213,7 +213,7 @@ class MainFragment : Fragment() {
             }
         }
     }
-    
+
     private fun connectToSelectedDevice(activity: Activity, device: IBluetoothDevice, loadingIndicator: ProgressBar) {
         synchronized(this) {
             if (currentConnectingIndicator == null) {
@@ -223,7 +223,7 @@ class MainFragment : Fragment() {
         }
 
         pullToRefreshContainer.isRefreshing = false
-        
+
         Log.d("Connecting", "Clicked on device '${device.name}'")
         if(!viewModel.bluetoothService.connectToDevice(activity, device)) {
             Toast.makeText(context, "Connecting to device '${device.name}' failed!",

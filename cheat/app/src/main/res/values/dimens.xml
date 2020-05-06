@@ -12,7 +12,10 @@
     <dimen name="chat_item_min_width">100dp</dimen>
     <dimen name="margin_send_btn">6dp</dimen>
     <dimen name="size_send_btn">55dp</dimen>
+    <dimen name="size_cancel_edit_btn">12dp</dimen>
     <dimen name="padding_send_btn">14dp</dimen>
+    <dimen name="padding_edit_btn">8dp</dimen>
+    <dimen name="max_edit_message_length">40</dimen>
 
 
 
