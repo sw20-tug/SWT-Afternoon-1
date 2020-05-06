@@ -9,6 +9,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -37,8 +38,10 @@ class ChatFragment : Fragment() {
         viewModel = ViewModelProvider(this).get(ChatViewModel::class.java)
         root =  inflater.inflate(R.layout.chat_fragment, container, false)
 
+        // viewModel.insertMessage(ChatEntry("Hi", true, false, Date()))
+
         val header = root.item_header_text.findViewById<TextView>(R.id.title)
-        header.text = BluetoothService.getConnectedDevice()!!.name
+        header.text = BluetoothService.getConnectedDevice()?.name
 
         BluetoothService.setOnMessageReceive { chatEntry ->
             chatEntry.isByMe = false
@@ -82,10 +85,21 @@ class ChatFragment : Fragment() {
 
             override fun onLongItemClick(view: View?, position: Int) {
                 val message = chatAdapter.getItemAt(position)
-                if (message.isByMe) {
-                    message.setDeleted()
-                    chatAdapter.notifyDataSetChanged()
-                    BluetoothService.sendMessage(message)
+                if (message.isByMe && !message.isDeleted()) {
+                    val builder = AlertDialog.Builder(activity!!)
+                    builder.setTitle("Options")
+                        .setItems(R.array.message_options) { _, which ->
+                            if (which == 0) {
+                                //start TODO edit here
+                            } else {
+                                deleteChatEntry(message)
+                            }
+                        }
+
+                    builder.setNegativeButton("Cancel") { _, _ -> }
+
+                    val dialog: AlertDialog = builder.create()
+                    dialog.show()
                 }
             }
         }))
@@ -96,6 +110,13 @@ class ChatFragment : Fragment() {
         initConnectionButton()
 
         return root
+    }
+
+    private fun deleteChatEntry(chatEntry: ChatEntry) {
+        chatEntry.setDeleted()
+        chatAdapter.notifyDataSetChanged()
+        BluetoothService.sendMessage(chatEntry)
+
     }
 
     private fun initConnectionButton() {
