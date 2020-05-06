@@ -152,23 +152,23 @@ class ChatFragment : Fragment() {
                 builder.setMessage("Do you want to send this image?")
 
                 builder.setPositiveButton("YES") { dialog, which ->
+                    Thread {
+                        val etMsg = root.item_text_entry_field.findViewById<EditText>(R.id.text_entry)
+                        val bitMap = MediaStore.Images.Media.getBitmap(context?.contentResolver, data.data!!)
+                        val bos = ByteArrayOutputStream()
+                        bitMap.compress(Bitmap.CompressFormat.JPEG, 70, bos)
+                        val array: ByteArray = bos.toByteArray()
+                        bitMap.recycle()
+                        Log.d("Image", "Image compressed, size ${array.size}")
 
-                    val etMsg = root.item_text_entry_field.findViewById<EditText>(R.id.text_entry)
-                    val bitMap =
-                        MediaStore.Images.Media.getBitmap(context?.contentResolver, data.data!!)
-                    val bos = ByteArrayOutputStream()
-                    bitMap.compress(Bitmap.CompressFormat.JPEG, 70, bos)
-                    val array: ByteArray = bos.toByteArray()
-                    bitMap.recycle()
-                    Log.d("Image", "Image compressed, size ${array.size}")
 
-
-                    val chatEntry = ChatEntry("", array, true, false, Date())
-                    chatEntries.add(chatEntry)
-                    BluetoothService.sendMessage(chatEntry)
-                    chatAdapter.notifyDataSetChanged()
-                    recyclerView.smoothScrollToPosition(chatEntries.size - 1)
-                    etMsg.text.clear()
+                        val chatEntry = ChatEntry("", array, true, false, Date())
+                        chatEntries.add(chatEntry)
+                        chatAdapter.notifyDataSetChanged()
+                        BluetoothService.sendMessage(chatEntry)
+                        recyclerView.smoothScrollToPosition(chatEntries.size - 1)
+                        etMsg.text.clear()
+                    }.start()
                 }
 
                 builder.setNegativeButton("NO"){_,_ -> }
