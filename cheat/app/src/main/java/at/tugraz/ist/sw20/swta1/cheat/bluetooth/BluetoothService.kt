@@ -12,7 +12,9 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.util.Log
-import androidx.core.content.ContextCompat.startActivity
+import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
 import at.tugraz.ist.sw20.swta1.cheat.ui.chat.ChatEntry
 import java.io.*
 import java.util.*
