@@ -11,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -139,26 +140,39 @@ class ChatFragment : Fragment() {
     
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-    
-        Log.d("Image", "Activity result, request: $requestCode, result: $resultCode, data: ${data != null}")
         
         if(resultCode == RESULT_OK && requestCode == RESULT_SELECT_IMAGE && data != null) {
-            Log.d("Image", "Image selected from gallery")
-            val etMsg = root.item_text_entry_field.findViewById<EditText>(R.id.text_entry)
-            val bitMap = MediaStore.Images.Media.getBitmap(context?.contentResolver, data.data!!)
-            val bos = ByteArrayOutputStream()
-            bitMap.compress(Bitmap.CompressFormat.JPEG, 70, bos)
-            val array : ByteArray = bos.toByteArray()
-            bitMap.recycle()
-            Log.d("Image", "Image compressed, size ${array.size}")
-            
-            
-            val chatEntry = ChatEntry("", array, true, false, Date())
-            chatEntries.add(chatEntry)
-            BluetoothService.sendMessage(chatEntry)
-            chatAdapter.notifyDataSetChanged()
-            recyclerView.smoothScrollToPosition(chatEntries.size - 1)
-            etMsg.text.clear()
+            if (BluetoothService.state != BluetoothState.CONNECTED) {
+                Toast.makeText(context, "Can't sent image while disconnected.", Toast.LENGTH_SHORT).show()
+            } else {
+                Log.d("Image", "Image selected from gallery")
+
+                val builder = AlertDialog.Builder(context!!)
+                builder.setTitle("Send Image")
+                builder.setMessage("Do you want to send this image?")
+
+                builder.setPositiveButton("YES") { dialog, which ->
+
+                    val etMsg = root.item_text_entry_field.findViewById<EditText>(R.id.text_entry)
+                    val bitMap =
+                        MediaStore.Images.Media.getBitmap(context?.contentResolver, data.data!!)
+                    val bos = ByteArrayOutputStream()
+                    bitMap.compress(Bitmap.CompressFormat.JPEG, 70, bos)
+                    val array: ByteArray = bos.toByteArray()
+                    bitMap.recycle()
+                    Log.d("Image", "Image compressed, size ${array.size}")
+
+
+                    val chatEntry = ChatEntry("", array, true, false, Date())
+                    chatEntries.add(chatEntry)
+                    BluetoothService.sendMessage(chatEntry)
+                    chatAdapter.notifyDataSetChanged()
+                    recyclerView.smoothScrollToPosition(chatEntries.size - 1)
+                    etMsg.text.clear()
+                }
+
+                builder.setNegativeButton("NO"){_,_ -> }
+            }
         }
     }
 }

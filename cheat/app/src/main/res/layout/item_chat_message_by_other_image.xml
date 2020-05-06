@@ -6,7 +6,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout
-        android:background="@drawable/rounded_background_other"
+        android:background="@drawable/rounded_background_other_image"
         android:layout_margin="@dimen/margin_text_small"
         android:minWidth="@dimen/chat_item_min_width"
         android:layout_width="0dp"
