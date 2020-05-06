@@ -12,13 +12,11 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.util.Log
-import android.widget.Toast
-import java.io.IOException
-import java.io.InputStream
-import java.io.OutputStream
+import androidx.core.content.ContextCompat.startActivity
 import at.tugraz.ist.sw20.swta1.cheat.ui.chat.ChatEntry
 import java.io.*
 import java.util.*
+
 
 object BluetoothService {
     private val adapter = BluetoothAdapter.getDefaultAdapter()
@@ -45,6 +43,13 @@ object BluetoothService {
     
     fun setOnMessageReceive(onMessageReceive: (ChatEntry) -> Any) {
         this.onMessageReceive = onMessageReceive
+    }
+
+    fun setDiscoverable(context: Context,timeInSeconds : Int = 300) {
+        val intent = Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE)
+        intent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, timeInSeconds)
+        context.startActivity(intent)
+
     }
     
     private fun updateState(state: BluetoothState) {

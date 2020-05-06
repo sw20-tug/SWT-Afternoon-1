@@ -64,7 +64,7 @@ class MainFragment : Fragment() {
                 startActivityForResult(enableBluetoothIntent, REQUEST_ENABLE_BLUETOOTH)
             }
         }
-
+        BluetoothService.setDiscoverable(context!!)
         val root = inflater.inflate(R.layout.main_fragment, container, false)
         lvPairedDevices = root.findViewById(R.id.list_paired_devices)
         lvNearbyDevices = root.findViewById(R.id.list_nearby_devices)
@@ -116,7 +116,8 @@ class MainFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-    
+
+        BluetoothService.setDiscoverable(context!!)
         synchronized(this) {
             activity!!.runOnUiThread {
                 currentConnectingIndicator?.visibility = View.GONE
