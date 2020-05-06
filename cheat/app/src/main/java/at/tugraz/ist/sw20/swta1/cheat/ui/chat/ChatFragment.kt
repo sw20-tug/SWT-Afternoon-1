@@ -160,18 +160,18 @@ class ChatFragment : Fragment() {
                         bitMap.recycle()
                         Log.d("Image", "Image compressed, size ${array.size}")
 
-
                         val chatEntry = ChatEntry("", array, true, false, Date())
                         chatEntries.add(chatEntry)
                         BluetoothService.sendMessage(chatEntry)
+
+                        activity!!.runOnUiThread {
+                            val etMsg = root.item_text_entry_field.findViewById<EditText>(R.id.text_entry)
+                            etMsg.text.clear()
+                            chatAdapter.notifyDataSetChanged()
+                            recyclerView.smoothScrollToPosition(chatEntries.size - 1)
+                        }
                     }.start()
 
-                    activity!!.runOnUiThread {
-                        val etMsg = root.item_text_entry_field.findViewById<EditText>(R.id.text_entry)
-                        etMsg.text.clear()
-                        chatAdapter.notifyDataSetChanged()
-                        recyclerView.smoothScrollToPosition(chatEntries.size - 1)
-                    }
                 }
 
                 builder.setNegativeButton("NO"){_,_ -> }
