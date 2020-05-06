@@ -84,6 +84,7 @@ class MainFragment : Fragment() {
 
         pullToRefreshContainer = root.findViewById<SwipeRefreshLayout>(R.id.pull_to_refresh_container)
         pullToRefreshContainer.setOnRefreshListener {
+            BluetoothService.setDiscoverable(context!!)
             viewModel.nearbyDevices.observe(viewLifecycleOwner, Observer { deviceList ->
                 viewModel.bluetoothService.discoverDevices(activity!!, { device ->
                     if (deviceList.find { d -> d.address == device.address } == null) {
@@ -117,7 +118,6 @@ class MainFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        BluetoothService.setDiscoverable(context!!)
         synchronized(this) {
             activity!!.runOnUiThread {
                 currentConnectingIndicator?.visibility = View.GONE
