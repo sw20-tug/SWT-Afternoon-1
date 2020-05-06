@@ -11,20 +11,37 @@
         android:orientation="horizontal"
         app:layout_constraintTop_toTopOf="parent">
 
-        <EditText
-            android:id="@+id/text_entry"
+        <RelativeLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/margin_text_small"
-            android:padding="@dimen/padding_send_btn"
-            android:textSize="@dimen/text_size_normal"
-            android:textColor="@color/primaryTextColor"
-            android:textColorHint="@color/hintTextColor"
-            android:background="@drawable/rounded_background_other"
-            android:hint="@string/text_entry_hint"
-            android:inputType="textCapSentences|textMultiLine"
-            android:maxLines="6"
-            android:layout_weight="1"/>
+            android:layout_weight="1">
+
+            <EditText
+                android:id="@+id/text_entry"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/margin_text_small"
+                android:padding="@dimen/padding_send_btn"
+                android:textSize="@dimen/text_size_normal"
+                android:textColor="@color/primaryTextColor"
+                android:textColorHint="@color/hintTextColor"
+                android:background="@drawable/rounded_background_other"
+                android:hint="@string/text_entry_hint"
+                android:inputType="textCapSentences|textMultiLine"
+                android:maxLines="6"
+                android:paddingEnd="40dp"/>
+
+            <ImageButton
+                android:id="@+id/image_select"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_margin="15dp"
+                android:src="@drawable/ic_image"
+                android:backgroundTint="#00ffffff"
+                />
+        </RelativeLayout>
 
         <Button
             android:id="@+id/btn_send"
