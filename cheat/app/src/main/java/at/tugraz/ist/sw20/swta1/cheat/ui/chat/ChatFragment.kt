@@ -162,7 +162,6 @@ class ChatFragment : Fragment() {
 
                         val chatEntry = ChatEntry("", array, true, false, Date())
                         chatEntries.add(chatEntry)
-                        BluetoothService.sendMessage(chatEntry)
 
                         activity!!.runOnUiThread {
                             val etMsg = root.item_text_entry_field.findViewById<EditText>(R.id.text_entry)
@@ -170,8 +169,9 @@ class ChatFragment : Fragment() {
                             chatAdapter.notifyDataSetChanged()
                             recyclerView.smoothScrollToPosition(chatEntries.size - 1)
                         }
+                        
+                        BluetoothService.sendMessage(chatEntry)
                     }.start()
-
                 }
 
                 builder.setNegativeButton("NO"){_,_ -> }
