@@ -24,6 +24,14 @@
             android:layout_height="0dp"/>
 
         <include
+            android:id="@+id/item_edit_hint"
+            layout="@layout/item_edit_hint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/margin_field_small"
+            android:visibility="gone"/>
+
+        <include
             android:id="@+id/item_text_entry_field"
             layout="@layout/item_text_entry_field"
             android:layout_width="match_parent"
