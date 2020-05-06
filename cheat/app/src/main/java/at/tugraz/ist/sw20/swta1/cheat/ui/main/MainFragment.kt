@@ -64,7 +64,7 @@ class MainFragment : Fragment() {
                 startActivityForResult(enableBluetoothIntent, REQUEST_ENABLE_BLUETOOTH)
             }
         }
-
+        BluetoothService.setDiscoverable(context!!)
         val root = inflater.inflate(R.layout.main_fragment, container, false)
         lvPairedDevices = root.findViewById(R.id.list_paired_devices)
         lvNearbyDevices = root.findViewById(R.id.list_nearby_devices)
@@ -84,6 +84,7 @@ class MainFragment : Fragment() {
 
         pullToRefreshContainer = root.findViewById<SwipeRefreshLayout>(R.id.pull_to_refresh_container)
         pullToRefreshContainer.setOnRefreshListener {
+            BluetoothService.setDiscoverable(context!!)
             viewModel.nearbyDevices.observe(viewLifecycleOwner, Observer { deviceList ->
                 viewModel.bluetoothService.discoverDevices(activity!!, { device ->
                     if (deviceList.find { d -> d.address == device.address } == null) {
@@ -116,7 +117,7 @@ class MainFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-    
+
         synchronized(this) {
             activity!!.runOnUiThread {
                 currentConnectingIndicator?.visibility = View.GONE
