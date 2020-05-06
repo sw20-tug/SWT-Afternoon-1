@@ -153,7 +153,6 @@ class ChatFragment : Fragment() {
 
                 builder.setPositiveButton("YES") { dialog, which ->
                     Thread {
-                        val etMsg = root.item_text_entry_field.findViewById<EditText>(R.id.text_entry)
                         val bitMap = MediaStore.Images.Media.getBitmap(context?.contentResolver, data.data!!)
                         val bos = ByteArrayOutputStream()
                         bitMap.compress(Bitmap.CompressFormat.JPEG, 70, bos)
@@ -164,11 +163,15 @@ class ChatFragment : Fragment() {
 
                         val chatEntry = ChatEntry("", array, true, false, Date())
                         chatEntries.add(chatEntry)
-                        chatAdapter.notifyDataSetChanged()
                         BluetoothService.sendMessage(chatEntry)
-                        recyclerView.smoothScrollToPosition(chatEntries.size - 1)
-                        etMsg.text.clear()
                     }.start()
+
+                    activity!!.runOnUiThread {
+                        val etMsg = root.item_text_entry_field.findViewById<EditText>(R.id.text_entry)
+                        etMsg.text.clear()
+                        chatAdapter.notifyDataSetChanged()
+                        recyclerView.smoothScrollToPosition(chatEntries.size - 1)
+                    }
                 }
 
                 builder.setNegativeButton("NO"){_,_ -> }
