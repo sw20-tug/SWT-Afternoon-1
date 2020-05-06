@@ -1,14 +1,16 @@
 package at.tugraz.ist.sw20.swta1.cheat.ui.chat
 
+import android.app.Activity.RESULT_OK
+import android.content.Intent
+import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -18,6 +20,10 @@ import at.tugraz.ist.sw20.swta1.cheat.R
 import at.tugraz.ist.sw20.swta1.cheat.bluetooth.BluetoothService
 import at.tugraz.ist.sw20.swta1.cheat.bluetooth.BluetoothState
 import kotlinx.android.synthetic.main.chat_fragment.view.*
+import java.io.BufferedOutputStream
+import java.io.ByteArrayOutputStream
+import java.io.FileOutputStream
+import java.io.ObjectOutputStream
 import java.util.*
 
 class ChatFragment : Fragment() {
@@ -31,6 +37,8 @@ class ChatFragment : Fragment() {
     private lateinit var root: View
     private lateinit var chatAdapter: ChatHistoryAdapter
     private lateinit var recyclerView: RecyclerView
+    
+    private val RESULT_SELECT_IMAGE = 1
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
@@ -76,6 +84,7 @@ class ChatFragment : Fragment() {
         (recyclerView.layoutManager as LinearLayoutManager).stackFromEnd = true
 
         initSendButton()
+        initPictureSendButton()
         initConnectionButton()
 
         return root
@@ -102,8 +111,7 @@ class ChatFragment : Fragment() {
 
         btnSend.setOnClickListener {
             val text = etMsg.text.toString().trim()
-            if (BluetoothService.state != BluetoothState.CONNECTED)
-            {
+            if (BluetoothService.state != BluetoothState.CONNECTED) {
                 Toast.makeText(context, "Can't sent message while disconnected.", Toast.LENGTH_SHORT).show()
             }
             else if (text.isNotBlank()) {
@@ -114,6 +122,43 @@ class ChatFragment : Fragment() {
                 recyclerView.smoothScrollToPosition(chatEntries.size - 1)
                 etMsg.text.clear()
             }
+        }
+    }
+    
+    private fun initPictureSendButton() {
+        val imageBtn = root.item_text_entry_field.findViewById<ImageButton>(R.id.image_select)
+    
+        imageBtn.setOnClickListener {
+            
+            val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+            intent.type = "image/*"
+            //intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            startActivityForResult(intent, RESULT_SELECT_IMAGE)
+        }
+    }
+    
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+    
+        Log.d("Image", "Activity result, request: $requestCode, result: $resultCode, data: ${data != null}")
+        
+        if(resultCode == RESULT_OK && requestCode == RESULT_SELECT_IMAGE && data != null) {
+            Log.d("Image", "Image selected from gallery")
+            val etMsg = root.item_text_entry_field.findViewById<EditText>(R.id.text_entry)
+            val bitMap = MediaStore.Images.Media.getBitmap(context?.contentResolver, data.data!!)
+            val bos = ByteArrayOutputStream()
+            bitMap.compress(Bitmap.CompressFormat.JPEG, 70, bos)
+            val array : ByteArray = bos.toByteArray()
+            bitMap.recycle()
+            Log.d("Image", "Image compressed, size ${array.size}")
+            
+            
+            val chatEntry = ChatEntry("", array, true, false, Date())
+            chatEntries.add(chatEntry)
+            BluetoothService.sendMessage(chatEntry)
+            chatAdapter.notifyDataSetChanged()
+            recyclerView.smoothScrollToPosition(chatEntries.size - 1)
+            etMsg.text.clear()
         }
     }
 }

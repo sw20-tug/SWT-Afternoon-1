@@ -2,7 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:id="@+id/item_chat_message_by_me"
+    android:id="@+id/item_chat_message_by_me_image"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout
@@ -18,10 +18,9 @@
         app:layout_constraintWidth_max="wrap"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/chat_message"
-            android:text="CHAT-MESSAGE"
-            android:textColor="@color/primaryTextColor"
+        <ImageView
+            android:id="@+id/chat_image"
+            android:src="@drawable/ic_launcher_foreground"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
@@ -35,4 +34,5 @@
             android:layout_height="wrap_content"/>
 
     </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
