@@ -34,6 +34,7 @@ class ChatFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
+        viewModel = ViewModelProvider(this).get(ChatViewModel::class.java)
         root =  inflater.inflate(R.layout.chat_fragment, container, false)
 
         val header = root.item_header_text.findViewById<TextView>(R.id.title)
@@ -95,11 +96,6 @@ class ChatFragment : Fragment() {
         initConnectionButton()
 
         return root
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(ChatViewModel::class.java)
     }
 
     private fun initConnectionButton() {
