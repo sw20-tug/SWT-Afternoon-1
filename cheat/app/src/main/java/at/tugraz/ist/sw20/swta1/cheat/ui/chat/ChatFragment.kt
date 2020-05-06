@@ -172,6 +172,9 @@ class ChatFragment : Fragment() {
                 }
 
                 builder.setNegativeButton("NO"){_,_ -> }
+
+                val dialog: AlertDialog = builder.create()
+                dialog.show()
             }
         }
     }
