@@ -15,6 +15,7 @@
     <dimen name="size_cancel_edit_btn">12dp</dimen>
     <dimen name="padding_send_btn">14dp</dimen>
     <dimen name="padding_edit_btn">8dp</dimen>
+    <dimen name="max_edit_message_length">40</dimen>
 
 
 

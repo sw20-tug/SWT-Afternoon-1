@@ -1,5 +1,6 @@
 package at.tugraz.ist.sw20.swta1.cheat.ui.chat
 
+import at.tugraz.ist.sw20.swta1.cheat.R
 import java.io.Serializable
 import java.text.SimpleDateFormat
 import java.util.*
@@ -21,8 +22,8 @@ class ChatEntry(private var message: String, var isByMe: Boolean, var isBySystem
     }
 
     fun getMessageShortened(): String {
-        if(message.length > 43) {
-            return message.replace("\n", " ").substring(0, 40) + "..."
+        if(message.length > R.dimen.max_edit_message_length + 3) {
+            return message.replace("\n", " ").substring(0, R.dimen.max_edit_message_length) + "..."
         }
         return message.replace("\n", " ")
     }
