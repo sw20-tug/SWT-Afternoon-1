@@ -3,16 +3,32 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:id="@+id/item_text"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
 
     <TextView
         android:id="@+id/device_name"
         android:textSize="@dimen/text_size_normal"
         android:textColor="@color/primaryTextColor"
         android:padding="@dimen/margin_text"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="ThisIsABluetoothName"
-        app:layout_constraintTop_toTopOf="parent"/>
+        tools:text="A single Bluetooth device"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/connecting_loading_indicator"
+        />
+
+    <include
+        android:id="@+id/connecting_loading_indicator"
+        layout="@layout/item_loading_spinner"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginEnd="@dimen/margin_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/device_name"
+        app:layout_constraintTop_toTopOf="@id/device_name"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
