@@ -20,6 +20,13 @@ class ChatEntry(private var message: String, var isByMe: Boolean, var isBySystem
         return message
     }
 
+    fun getMessageShortened(): String {
+        if(message.length > 43) {
+            return message.replace("\n", " ").substring(0, 40) + "..."
+        }
+        return message.replace("\n", " ")
+    }
+
     fun getId(): UUID {
         return id
     }

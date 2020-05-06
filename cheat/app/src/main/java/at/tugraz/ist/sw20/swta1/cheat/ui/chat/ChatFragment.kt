@@ -32,6 +32,7 @@ class ChatFragment : Fragment() {
     private lateinit var root: View
     private lateinit var chatAdapter: ChatHistoryAdapter
     private lateinit var recyclerView: RecyclerView
+    private var currentEditMessage: ChatEntry? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
@@ -90,7 +91,11 @@ class ChatFragment : Fragment() {
                     builder.setTitle("Options")
                         .setItems(R.array.message_options) { _, which ->
                             if (which == 0) {
-                                //start TODO edit here
+                                currentEditMessage = message
+                                root.item_edit_hint.visibility = View.VISIBLE
+                                root.item_edit_hint.findViewById<TextView>(R.id.tv_edit_text).text = message.getMessageShortened()
+                                val etMsg = root.item_text_entry_field.findViewById<EditText>(R.id.text_entry)
+                                etMsg.setText(message.getMessage())
                             } else {
                                 deleteChatEntry(message)
                             }
@@ -103,6 +108,13 @@ class ChatFragment : Fragment() {
                 }
             }
         }))
+
+        root.item_edit_hint.findViewById<Button>(R.id.btn_cancel_edit).setOnClickListener {
+            currentEditMessage = null
+            root.item_edit_hint.visibility = View.GONE
+            val etMsg = root.item_text_entry_field.findViewById<EditText>(R.id.text_entry)
+            etMsg.text.clear()
+        }
 
         (recyclerView.layoutManager as LinearLayoutManager).stackFromEnd = true
 
@@ -139,11 +151,20 @@ class ChatFragment : Fragment() {
                 Toast.makeText(context, "Can't sent message while disconnected.", Toast.LENGTH_SHORT).show()
             }
             else if (text.isNotBlank()) {
-                val chatEntry = ChatEntry(text, true, false, Date())
+                var chatEntry = currentEditMessage
+                if(chatEntry != null) {
+                    chatEntry.edit(text)
+                    currentEditMessage = null
+                    root.item_edit_hint.visibility = View.GONE
+                } else {
+                    chatEntry = ChatEntry(text, true, false, Date())
+                }
                 val scrollPosition = viewModel.insertMessage(chatEntry)
                 BluetoothService.sendMessage(chatEntry)
                 chatAdapter.notifyDataSetChanged()
-                recyclerView.smoothScrollToPosition(scrollPosition)
+                if(scrollPosition != -1) {
+                    recyclerView.smoothScrollToPosition(scrollPosition)
+                }
                 etMsg.text.clear()
             }
         }
