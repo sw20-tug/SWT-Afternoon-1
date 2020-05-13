@@ -1,5 +1,6 @@
 package at.tugraz.ist.sw20.swta1.cheat.ui.chat
 
+import android.content.Context
 import at.tugraz.ist.sw20.swta1.cheat.R
 import java.io.Serializable
 import java.text.SimpleDateFormat
@@ -17,13 +18,19 @@ class ChatEntry(private var message: String, var isByMe: Boolean, var isBySystem
         return df.format(timestamp)
     }
 
+    fun getFormattedEditTimestamp(): String {
+        val df = SimpleDateFormat("HH:mm", Locale.US)
+        return df.format(editTimestamp!!)
+    }
+
     fun getMessage(): String {
         return message
     }
 
-    fun getMessageShortened(): String {
-        if(message.length > R.dimen.max_edit_message_length + 3) {
-            return message.replace("\n", " ").substring(0, R.dimen.max_edit_message_length) + "..."
+    fun getMessageShortened(context: Context): String {
+        val maxLength = context.resources.getInteger(R.integer.max_edit_message_length)
+        if(message.length > maxLength + 3) {
+            return message.replace("\n", " ").substring(0, maxLength) + "..."
         }
         return message.replace("\n", " ")
     }
