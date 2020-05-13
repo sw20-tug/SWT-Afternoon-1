@@ -24,6 +24,7 @@ import at.tugraz.ist.sw20.swta1.cheat.R
 import at.tugraz.ist.sw20.swta1.cheat.RecyclerItemClickListener
 import at.tugraz.ist.sw20.swta1.cheat.bluetooth.BluetoothService
 import at.tugraz.ist.sw20.swta1.cheat.bluetooth.BluetoothState
+import at.tugraz.ist.sw20.swta1.cheat.bluetooth.IBluetoothDevice
 import kotlinx.android.synthetic.main.chat_fragment.view.*
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -41,6 +42,8 @@ class ChatFragment : Fragment() {
     private lateinit var root: View
     private lateinit var chatAdapter: ChatHistoryAdapter
     private lateinit var recyclerView: RecyclerView
+    private var reconnect = true
+    private var chatPartner: IBluetoothDevice? = null
     private var currentEditMessage: ChatEntry? = null
     
     private val RESULT_SELECT_IMAGE = 1
@@ -56,11 +59,18 @@ class ChatFragment : Fragment() {
         // viewModel.insertMessage(ChatEntry("Hi", true, false, Date()))
 
         val header = root.item_header_text.findViewById<TextView>(R.id.title)
-        header.text = BluetoothService.getConnectedDevice()?.name
+        chatPartner = BluetoothService.getConnectedDevice()
+        header.text = chatPartner?.name
 
         BluetoothService.setOnMessageReceive { chatEntry ->
             chatEntry.isByMe = false
             Log.i("Message", "Message received: ${chatEntry.getMessage()}")
+            if (chatEntry.isBySystem && chatEntry.getMessage() == getString(R.string.partner_disconnected))  {
+                reconnect = false;
+            }
+            if (chatEntry.isBySystem && chatEntry.getMessage() == getString(R.string.partner_connected))  {
+                reconnect = false;
+            }
             val scrollPosition = viewModel.insertMessage(chatEntry)
             activity!!.runOnUiThread {
                 chatAdapter.notifyDataSetChanged()
@@ -77,15 +87,21 @@ class ChatFragment : Fragment() {
                 when (newState) {
                     BluetoothState.CONNECTED -> connection_status.text =
                         getString(R.string.connected_status)
-                    BluetoothState.READY -> connection_status.text =
-                        getString(R.string.disconnected_status)
+                    BluetoothState.READY -> {
+                        connection_status.text = getString(R.string.disconnected_status)
+                        if (reconnect) {
+                            chatPartner?.let {
+                                BluetoothService.connectToDevice(activity!!, it)
+                            }
+                        }
+                    }
                     else -> {
                     }
                 }
             }
         }
 
-        chatAdapter = ChatHistoryAdapter(viewModel.getChatEntries())
+        chatAdapter = ChatHistoryAdapter(viewModel.getChatEntries(), context!!)
 
         recyclerView = root.findViewById<RecyclerView>(R.id.chat_history).apply {
             layoutManager = LinearLayoutManager(context!!)
@@ -102,12 +118,13 @@ class ChatFragment : Fragment() {
                 val message = chatAdapter.getItemAt(position)
                 if (message.isByMe && !message.isDeleted()) {
                     val builder = AlertDialog.Builder(activity!!)
-                    builder.setTitle("Options")
+                    builder.setTitle(getString(R.string.chat_options_title))
                         .setItems(R.array.message_options) { _, which ->
                             if (which == 0) {
                                 currentEditMessage = message
                                 root.item_edit_hint.visibility = View.VISIBLE
-                                root.item_edit_hint.findViewById<TextView>(R.id.tv_edit_text).text = message.getMessageShortened()
+                                root.item_edit_hint.findViewById<TextView>(R.id.tv_edit_text).text =
+                                    message.getMessageShortened(context!!)
                                 val etMsg = root.item_text_entry_field.findViewById<EditText>(R.id.text_entry)
                                 etMsg.setText(message.getMessage())
                             } else {
@@ -115,7 +132,7 @@ class ChatFragment : Fragment() {
                             }
                         }
 
-                    builder.setNegativeButton("Cancel") { _, _ -> }
+                    builder.setNegativeButton(getString(R.string.chat_options_neg)) { _, _ -> }
 
                     val dialog: AlertDialog = builder.create()
                     dialog.show()
@@ -162,9 +179,8 @@ class ChatFragment : Fragment() {
         btnSend.setOnClickListener {
             val text = etMsg.text.toString().trim()
             if (BluetoothService.state != BluetoothState.CONNECTED) {
-                Toast.makeText(context, "Can't sent message while disconnected.", Toast.LENGTH_SHORT).show()
-            }
-            else if (text.isNotBlank()) {
+                Toast.makeText(context, getString(R.string.sending_message_disconnected), Toast.LENGTH_SHORT).show()
+            } else if (text.isNotBlank()) {
                 var chatEntry = currentEditMessage
                 if(chatEntry != null) {
                     chatEntry.edit(text)
