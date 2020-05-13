@@ -51,7 +51,10 @@ class ChatFragment : Fragment() {
         BluetoothService.setOnMessageReceive { chatEntry ->
             chatEntry.isByMe = false
             Log.i("Message", "Message received: ${chatEntry.getMessage()}")
-            if (chatEntry.isBySystem && chatEntry.getMessage() == "Chat partner left.")  {
+            if (chatEntry.isBySystem && chatEntry.getMessage() == getString(R.string.partner_disconnected))  {
+                reconnect = false;
+            }
+            if (chatEntry.isBySystem && chatEntry.getMessage() == getString(R.string.partner_connected))  {
                 reconnect = false;
             }
             val scrollPosition = viewModel.insertMessage(chatEntry)
