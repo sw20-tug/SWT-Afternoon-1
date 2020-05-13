@@ -34,14 +34,16 @@ class ChatHistoryAdapter(private val dataSource: ArrayList<ChatEntry>, private v
 
         holder.view.findViewById<TextView>(R.id.chat_timestamp).text = chatEntry.getFormattedTimestamp()
 
-        val etEditTimestamp = holder.view.findViewById<TextView>(R.id.chat_edit_timestamp)
-        if (chatEntry.isEdited()) {
-            etEditTimestamp.text = context.getString(R.string.edit_timestamp,
-                chatEntry.getFormattedEditTimestamp())
-            etEditTimestamp.visibility = View.VISIBLE
-        }
-        else {
-            etEditTimestamp.visibility = View.GONE
+        if (!chatEntry.isSystemMessage()) {
+            val etEditTimestamp = holder.view.findViewById<TextView>(R.id.chat_edit_timestamp)
+            if (chatEntry.isEdited()) {
+                etEditTimestamp.text = context.getString(R.string.edit_timestamp,
+                    chatEntry.getFormattedEditTimestamp())
+                etEditTimestamp.visibility = View.VISIBLE
+            }
+            else {
+                etEditTimestamp.visibility = View.GONE
+            }
         }
     }
 
