@@ -19,6 +19,7 @@ import at.tugraz.ist.sw20.swta1.cheat.R
 import at.tugraz.ist.sw20.swta1.cheat.RecyclerItemClickListener
 import at.tugraz.ist.sw20.swta1.cheat.bluetooth.BluetoothService
 import at.tugraz.ist.sw20.swta1.cheat.bluetooth.BluetoothState
+import at.tugraz.ist.sw20.swta1.cheat.bluetooth.IBluetoothDevice
 import kotlinx.android.synthetic.main.chat_fragment.view.*
 import java.util.*
 
@@ -32,6 +33,8 @@ class ChatFragment : Fragment() {
     private lateinit var root: View
     private lateinit var chatAdapter: ChatHistoryAdapter
     private lateinit var recyclerView: RecyclerView
+    private var reconnect = true
+    private var chatPartner: IBluetoothDevice? = null
     private var currentEditMessage: ChatEntry? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -42,11 +45,18 @@ class ChatFragment : Fragment() {
         // viewModel.insertMessage(ChatEntry("Hi", true, false, Date()))
 
         val header = root.item_header_text.findViewById<TextView>(R.id.title)
-        header.text = BluetoothService.getConnectedDevice()?.name
+        chatPartner = BluetoothService.getConnectedDevice()
+        header.text = chatPartner?.name
 
         BluetoothService.setOnMessageReceive { chatEntry ->
             chatEntry.isByMe = false
             Log.i("Message", "Message received: ${chatEntry.getMessage()}")
+            if (chatEntry.isBySystem && chatEntry.getMessage() == getString(R.string.partner_disconnected))  {
+                reconnect = false;
+            }
+            if (chatEntry.isBySystem && chatEntry.getMessage() == getString(R.string.partner_connected))  {
+                reconnect = false;
+            }
             val scrollPosition = viewModel.insertMessage(chatEntry)
             activity!!.runOnUiThread {
                 chatAdapter.notifyDataSetChanged()
@@ -63,8 +73,14 @@ class ChatFragment : Fragment() {
                 when (newState) {
                     BluetoothState.CONNECTED -> connection_status.text =
                         getString(R.string.connected_status)
-                    BluetoothState.READY -> connection_status.text =
-                        getString(R.string.disconnected_status)
+                    BluetoothState.READY -> {
+                        connection_status.text = getString(R.string.disconnected_status)
+                        if (reconnect) {
+                            chatPartner?.let {
+                                BluetoothService.connectToDevice(activity!!, it)
+                            }
+                        }
+                    }
                     else -> {
                     }
                 }
