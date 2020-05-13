@@ -24,16 +24,24 @@ class ChatHistoryAdapter(private val dataSource: ArrayList<ChatEntry>, private v
         val chatEntry = dataSource[position]
         val tvMessage = holder.view.findViewById<TextView>(R.id.chat_message)
         tvMessage.text = chatEntry.getMessage()
+
         if (chatEntry.isDeleted()) {
-            tvMessage.setTypeface(null, Typeface.ITALIC);
+            tvMessage.setTypeface(null, Typeface.ITALIC)
         }
+        else {
+            tvMessage.setTypeface(null, Typeface.NORMAL)
+        }
+
         holder.view.findViewById<TextView>(R.id.chat_timestamp).text = chatEntry.getFormattedTimestamp()
 
+        val etEditTimestamp = holder.view.findViewById<TextView>(R.id.chat_edit_timestamp)
         if (chatEntry.isEdited()) {
-            val etEditTimestamp = holder.view.findViewById<TextView>(R.id.chat_edit_timestamp)
             etEditTimestamp.text = context.getString(R.string.edit_timestamp,
                 chatEntry.getFormattedEditTimestamp())
             etEditTimestamp.visibility = View.VISIBLE
+        }
+        else {
+            etEditTimestamp.visibility = View.GONE
         }
     }
 
