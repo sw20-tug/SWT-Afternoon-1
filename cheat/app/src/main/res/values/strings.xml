@@ -7,4 +7,6 @@
     <string name="text_entry_hint">Message</string>
     <string name="chat_partner">Chat Partner</string>
     <string name="edit_timestamp">(&#9999; %1$s)</string>
+    <string name="partner_connected">Chat partner joined.</string>
+    <string name="partner_disconnected">Chat partner left.</string>
 </resources>

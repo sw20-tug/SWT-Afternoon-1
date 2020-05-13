@@ -11,7 +11,6 @@ import android.view.*
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.core.view.get
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -20,7 +19,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import at.tugraz.ist.sw20.swta1.cheat.ChatActivity
-import at.tugraz.ist.sw20.swta1.cheat.MainActivity
 import at.tugraz.ist.sw20.swta1.cheat.R
 import at.tugraz.ist.sw20.swta1.cheat.RecyclerItemClickListener
 import at.tugraz.ist.sw20.swta1.cheat.bluetooth.BluetoothService
