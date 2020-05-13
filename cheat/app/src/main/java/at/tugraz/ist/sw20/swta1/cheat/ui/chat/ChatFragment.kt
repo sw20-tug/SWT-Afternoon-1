@@ -33,6 +33,7 @@ class ChatFragment : Fragment() {
     private lateinit var root: View
     private lateinit var chatAdapter: ChatHistoryAdapter
     private lateinit var recyclerView: RecyclerView
+    private var reconnect = true
     private var chatPartner: IBluetoothDevice? = null
     private var currentEditMessage: ChatEntry? = null
 
@@ -50,6 +51,9 @@ class ChatFragment : Fragment() {
         BluetoothService.setOnMessageReceive { chatEntry ->
             chatEntry.isByMe = false
             Log.i("Message", "Message received: ${chatEntry.getMessage()}")
+            if (chatEntry.isBySystem && chatEntry.getMessage() == "Chat partner left.")  {
+                reconnect = false;
+            }
             val scrollPosition = viewModel.insertMessage(chatEntry)
             activity!!.runOnUiThread {
                 chatAdapter.notifyDataSetChanged()
@@ -68,8 +72,10 @@ class ChatFragment : Fragment() {
                         getString(R.string.connected_status)
                     BluetoothState.READY -> {
                         connection_status.text = getString(R.string.disconnected_status)
-                        chatPartner?.let {
-                            BluetoothService.connectToDevice(activity!!, chatPartner!!)
+                        if (reconnect) {
+                            chatPartner?.let {
+                                BluetoothService.connectToDevice(activity!!, it)
+                            }
                         }
                     }
                     else -> {
