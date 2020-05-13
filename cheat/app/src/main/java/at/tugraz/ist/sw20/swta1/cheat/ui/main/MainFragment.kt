@@ -55,7 +55,7 @@ class MainFragment : Fragment() {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
         if (bluetoothAdapter == null) {
             // Device doesn't support bluetooth
-            Toast.makeText(activity, "No Bluetooth available", Toast.LENGTH_SHORT).show()
+            Toast.makeText(activity, getString(R.string.no_bluetooth), Toast.LENGTH_SHORT).show()
         } else {
             if (!bluetoothAdapter!!.isEnabled) {
                 val enableBluetoothIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
@@ -137,7 +137,7 @@ class MainFragment : Fragment() {
 
                 if(oldState == BluetoothState.ATTEMPT_CONNECTION) {
                     activity!!.runOnUiThread {
-                        Toast.makeText(context, "Connecting failed", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, getString(R.string.connection_failed), Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -201,13 +201,13 @@ class MainFragment : Fragment() {
         if (requestCode == REQUEST_ENABLE_BLUETOOTH) {
             if (resultCode == Activity.RESULT_OK) {
                 if (bluetoothAdapter!!.isEnabled) {
-                    Toast.makeText(activity, "Bluetooth enabled", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(activity, getString(R.string.bluetooth_enabled), Toast.LENGTH_SHORT).show()
                     showBluetoothDevices()
                 } else {
-                    Toast.makeText(activity, "Bluetooth disabled", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(activity, getString(R.string.bluetooth_disabled), Toast.LENGTH_SHORT).show()
                 }
             } else if (resultCode == Activity.RESULT_CANCELED) {
-                Toast.makeText(activity, "Bluetooth enabling cancelled", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity, getString(R.string.bluetooth_enable_cancelled), Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -224,9 +224,9 @@ class MainFragment : Fragment() {
 
         Log.d("Connecting", "Clicked on device '${device.name}'")
         if(!viewModel.bluetoothService.connectToDevice(activity, device)) {
-            Toast.makeText(context, "Connecting to device '${device.name}' failed!",
+            Toast.makeText(context, getString(R.string.connect_to_failed, device.name),
                 Toast.LENGTH_LONG).show()
-            Log.e("Connecting", "Connecting to device '${device.name}' failed")
+            Log.e("Connecting", getString(R.string.connect_to_failed, device.name))
             synchronized(this) {
                 currentConnectingIndicator = null
                 loadingIndicator.visibility = View.GONE
