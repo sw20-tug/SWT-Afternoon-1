@@ -23,10 +23,8 @@ class ChatHistoryAdapter(private val dataSource: ArrayList<ChatEntry>, private v
 
     override fun onBindViewHolder(holder: ChatViewHolder, position: Int) {
         val chatEntry = dataSource[position]
-        val tvMessage = holder.view.findViewById<TextView>(R.id.chat_message)
-        tvMessage.text = chatEntry.getMessage()
         
-        if(chatEntry.isImage()) {
+        if(chatEntry.isImage() && !chatEntry.isDeleted()) {
             holder.view.findViewById<ImageView>(R.id.chat_image).setImageBitmap(chatEntry.getImage())
         } else {
             val tvMessage = holder.view.findViewById<TextView>(R.id.chat_message)
