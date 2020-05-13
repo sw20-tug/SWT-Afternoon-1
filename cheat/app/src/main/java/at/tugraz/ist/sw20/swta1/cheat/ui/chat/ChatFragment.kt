@@ -87,7 +87,7 @@ class ChatFragment : Fragment() {
             }
         }
 
-        chatAdapter = ChatHistoryAdapter(viewModel.getChatEntries())
+        chatAdapter = ChatHistoryAdapter(viewModel.getChatEntries(), context!!)
 
         recyclerView = root.findViewById<RecyclerView>(R.id.chat_history).apply {
             layoutManager = LinearLayoutManager(context!!)
@@ -109,7 +109,8 @@ class ChatFragment : Fragment() {
                             if (which == 0) {
                                 currentEditMessage = message
                                 root.item_edit_hint.visibility = View.VISIBLE
-                                root.item_edit_hint.findViewById<TextView>(R.id.tv_edit_text).text = message.getMessageShortened()
+                                root.item_edit_hint.findViewById<TextView>(R.id.tv_edit_text).text =
+                                    message.getMessageShortened(context!!)
                                 val etMsg = root.item_text_entry_field.findViewById<EditText>(R.id.text_entry)
                                 etMsg.setText(message.getMessage())
                             } else {
