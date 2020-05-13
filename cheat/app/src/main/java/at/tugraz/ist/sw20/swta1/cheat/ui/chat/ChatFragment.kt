@@ -38,6 +38,7 @@ class ChatFragment : Fragment() {
     private var currentEditMessage: ChatEntry? = null
     
     private val RESULT_SELECT_IMAGE = 1
+    private val RESULT_CAPTURE_IMAGE = 2
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
@@ -180,53 +181,77 @@ class ChatFragment : Fragment() {
     
         imageBtn.setOnClickListener {
             
-            val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-            intent.type = "image/*"
-            //intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            startActivityForResult(intent, RESULT_SELECT_IMAGE)
+            val layout = layoutInflater.inflate(R.layout.dialog_choose_image_src, null) as View
+            val dialog = AlertDialog.Builder(context!!).create()
+            dialog.setView(layout)
+            
+            layout.findViewById<Button>(R.id.dialog_image_src_camera).setOnClickListener {
+                val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                dialog.cancel()
+                startActivityForResult(intent, RESULT_CAPTURE_IMAGE)
+            }
+    
+            layout.findViewById<Button>(R.id.dialog_image_src_gallery).setOnClickListener {
+                val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+                intent.type = "image/*"
+                dialog.cancel()
+                startActivityForResult(intent, RESULT_SELECT_IMAGE)
+            }
+            
+            dialog.show()
         }
     }
     
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        
-        if(resultCode == RESULT_OK && requestCode == RESULT_SELECT_IMAGE && data != null) {
+    
+        fun sendImage (bitmap: Bitmap) {
             if (BluetoothService.state != BluetoothState.CONNECTED) {
                 Toast.makeText(context, "Can't sent image while disconnected.", Toast.LENGTH_SHORT).show()
             } else {
-                Log.d("Image", "Image selected from gallery")
-
                 val builder = AlertDialog.Builder(context!!)
                 builder.setTitle("Send Image")
                 builder.setMessage("Do you want to send this image?")
-
+                
+                Log.d("Image", "Dim: ${bitmap.width}x${bitmap.height}")
+    
                 builder.setPositiveButton("YES") { dialog, which ->
                     Thread {
-                        val bitMap = MediaStore.Images.Media.getBitmap(context?.contentResolver, data.data!!)
+            
                         val bos = ByteArrayOutputStream()
-                        bitMap.compress(Bitmap.CompressFormat.JPEG, 70, bos)
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 70, bos)
                         val array: ByteArray = bos.toByteArray()
-                        bitMap.recycle()
+                        bitmap.recycle()
                         Log.d("Image", "Image compressed, size ${array.size}")
-
+            
                         val chatEntry = ChatEntry("", array, true, false, Date())
                         val index = viewModel.insertMessage(chatEntry)
-
+            
                         activity!!.runOnUiThread {
                             val etMsg = root.item_text_entry_field.findViewById<EditText>(R.id.text_entry)
                             etMsg.text.clear()
                             chatAdapter.notifyDataSetChanged()
                             recyclerView.smoothScrollToPosition(index)
                         }
-                        
+            
                         BluetoothService.sendMessage(chatEntry)
                     }.start()
                 }
-
+    
                 builder.setNegativeButton("NO"){_,_ -> }
-
+    
                 val dialog: AlertDialog = builder.create()
                 dialog.show()
+            }
+        }
+        
+        if(resultCode == RESULT_OK && data != null) {
+            if(requestCode == RESULT_SELECT_IMAGE) {
+                Log.d("Image", "Image selected from gallery")
+                sendImage(MediaStore.Images.Media.getBitmap(context?.contentResolver, data.data!!))
+            } else if(requestCode == RESULT_CAPTURE_IMAGE) {
+                Log.d("Image", "Image taken with camera")
+                sendImage(data.extras!!.get("data") as Bitmap)
             }
         }
     }
