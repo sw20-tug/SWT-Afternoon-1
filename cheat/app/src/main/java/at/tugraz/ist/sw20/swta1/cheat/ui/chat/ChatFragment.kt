@@ -3,7 +3,6 @@ package at.tugraz.ist.sw20.swta1.cheat.ui.chat
 import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.graphics.Bitmap
-import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
@@ -14,7 +13,6 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
-import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -164,8 +162,8 @@ class ChatFragment : Fragment() {
     }
 
     private fun initConnectionButton() {
-        val connection_status = root.findViewById<TextView>(R.id.connection_status)
-        connection_status.setOnClickListener {
+        val connectionStatus = root.findViewById<TextView>(R.id.connection_status)
+        connectionStatus.setOnClickListener {
             if(BluetoothService.state == BluetoothState.CONNECTED) {
                 (activity as ChatActivity).disconnect()
             }
@@ -226,7 +224,7 @@ class ChatFragment : Fragment() {
                     file
                 } catch (ex: IOException) {
                     dialog.cancel()
-                    Toast.makeText(context, "Creating image file failed.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, context!!.getString(R.string.image_creation_failed), Toast.LENGTH_SHORT).show()
                     null
                 }
 
@@ -254,15 +252,15 @@ class ChatFragment : Fragment() {
     
         fun sendImage (bitmap: Bitmap) {
             if (BluetoothService.state != BluetoothState.CONNECTED) {
-                Toast.makeText(context, "Can't sent image while disconnected.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context!!.getString(R.string.sending_message_disconnected), Toast.LENGTH_SHORT).show()
             } else {
                 val builder = AlertDialog.Builder(context!!)
-                builder.setTitle("Send Image")
-                builder.setMessage("Do you want to send this image?")
+                builder.setTitle(context!!.getString(R.string.send_image_dialog_title))
+                builder.setMessage(context!!.getString(R.string.send_image_dialog))
                 
                 Log.d("Image", "Dim: ${bitmap.width}x${bitmap.height}")
     
-                builder.setPositiveButton("YES") { dialog, which ->
+                builder.setPositiveButton(context!!.getString(R.string.dialog_option_yes)) { dialog, which ->
                     Thread {
             
                         val bos = ByteArrayOutputStream()
@@ -285,7 +283,7 @@ class ChatFragment : Fragment() {
                     }.start()
                 }
     
-                builder.setNegativeButton("NO"){_,_ -> }
+                builder.setNegativeButton(context!!.getString(R.string.dialog_option_no)){_,_ -> }
     
                 val dialog: AlertDialog = builder.create()
                 dialog.show()
