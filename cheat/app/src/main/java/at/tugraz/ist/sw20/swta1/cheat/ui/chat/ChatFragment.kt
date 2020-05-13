@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
@@ -12,6 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -23,7 +25,10 @@ import at.tugraz.ist.sw20.swta1.cheat.bluetooth.BluetoothService
 import at.tugraz.ist.sw20.swta1.cheat.bluetooth.BluetoothState
 import kotlinx.android.synthetic.main.chat_fragment.view.*
 import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.IOException
 import java.util.*
+import java.text.SimpleDateFormat
 
 class ChatFragment : Fragment() {
     companion object {
@@ -39,6 +44,8 @@ class ChatFragment : Fragment() {
     
     private val RESULT_SELECT_IMAGE = 1
     private val RESULT_CAPTURE_IMAGE = 2
+
+    private lateinit var currentPhotoPath: String
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
@@ -187,8 +194,31 @@ class ChatFragment : Fragment() {
             
             layout.findViewById<Button>(R.id.dialog_image_src_camera).setOnClickListener {
                 val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                dialog.cancel()
-                startActivityForResult(intent, RESULT_CAPTURE_IMAGE)
+
+                val photoFile: File? = try {
+                    val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+                    val storageDir: File? = context!!.getExternalFilesDir(Environment.DIRECTORY_DCIM)
+
+                    File.createTempFile(
+                            "IMG_${timeStamp}",
+                            ".jpg",
+                            storageDir
+                    ).apply {
+                        currentPhotoPath = absolutePath
+                    }
+                } catch (ex: IOException) {
+                    currentPhotoPath = ""
+                    dialog.cancel()
+                    Toast.makeText(context, "Creating image file failed.", Toast.LENGTH_SHORT).show()
+                    null
+                }
+
+                photoFile?.also {
+                    val photoUri = FileProvider.getUriForFile(context!!, activity!!.applicationContext.packageName + "fileprovider", it);
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
+                    dialog.cancel()
+                    startActivityForResult(intent, RESULT_CAPTURE_IMAGE)
+                }
             }
     
             layout.findViewById<Button>(R.id.dialog_image_src_gallery).setOnClickListener {
@@ -251,7 +281,8 @@ class ChatFragment : Fragment() {
                 sendImage(MediaStore.Images.Media.getBitmap(context?.contentResolver, data.data!!))
             } else if(requestCode == RESULT_CAPTURE_IMAGE) {
                 Log.d("Image", "Image taken with camera")
-                sendImage(data.extras!!.get("data") as Bitmap)
+
+                sendImage(MediaStore.Images.Media.getBitmap(context!!.getContentResolver(), Uri.parse(currentPhotoPath)))
             }
         }
     }
