@@ -44,7 +44,7 @@ class ChatActivity : AppCompatActivity() {
             super.onBackPressed()
         }
 
-        builder.setNegativeButton(getString(R.string.disconnect_message_pos)){_,_ -> }
+        builder.setNegativeButton(getString(R.string.disconnect_message_neg)){_,_ -> }
 
         val dialog: AlertDialog = builder.create()
         dialog.show()
