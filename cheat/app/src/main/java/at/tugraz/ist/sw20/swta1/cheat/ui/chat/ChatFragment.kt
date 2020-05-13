@@ -104,7 +104,7 @@ class ChatFragment : Fragment() {
                 val message = chatAdapter.getItemAt(position)
                 if (message.isByMe && !message.isDeleted()) {
                     val builder = AlertDialog.Builder(activity!!)
-                    builder.setTitle("Options")
+                    builder.setTitle(getString(R.string.chat_options_title))
                         .setItems(R.array.message_options) { _, which ->
                             if (which == 0) {
                                 currentEditMessage = message
@@ -118,7 +118,7 @@ class ChatFragment : Fragment() {
                             }
                         }
 
-                    builder.setNegativeButton("Cancel") { _, _ -> }
+                    builder.setNegativeButton(getString(R.string.chat_options_neg)) { _, _ -> }
 
                     val dialog: AlertDialog = builder.create()
                     dialog.show()
@@ -165,7 +165,7 @@ class ChatFragment : Fragment() {
             val text = etMsg.text.toString().trim()
             if (BluetoothService.state != BluetoothState.CONNECTED)
             {
-                Toast.makeText(context, "Can't sent message while disconnected.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, getString(R.string.sending_message_disconnected), Toast.LENGTH_SHORT).show()
             }
             else if (text.isNotBlank()) {
                 var chatEntry = currentEditMessage

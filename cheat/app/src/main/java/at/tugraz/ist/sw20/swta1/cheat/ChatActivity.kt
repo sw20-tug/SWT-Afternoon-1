@@ -34,17 +34,17 @@ class ChatActivity : AppCompatActivity() {
     fun disconnect()
     {
         val builder = AlertDialog.Builder(this)
-        builder.setTitle("Exit")
-        builder.setMessage("Do you want to leave the chat?")
+        builder.setTitle(getString(R.string.disconnect_message_title))
+        builder.setMessage(getString(R.string.disconnect_message_message))
 
-        builder.setPositiveButton("YES"){dialog, which ->
+        builder.setPositiveButton(getString(R.string.disconnect_message_pos)){dialog, which ->
             val chatEntry = ChatEntry(getString(R.string.partner_disconnected), true, true, Date())
             BluetoothService.sendMessage(chatEntry)
             BluetoothService.disconnect()
             super.onBackPressed()
         }
 
-        builder.setNegativeButton("No"){_,_ -> }
+        builder.setNegativeButton(getString(R.string.disconnect_message_neg)){_,_ -> }
 
         val dialog: AlertDialog = builder.create()
         dialog.show()

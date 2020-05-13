@@ -9,4 +9,17 @@
     <string name="edit_timestamp">(&#9999; %1$s)</string>
     <string name="partner_connected">Chat partner joined.</string>
     <string name="partner_disconnected">Chat partner left.</string>
+    <string name="disconnect_message_title">Exit</string>
+    <string name="disconnect_message_message">Do you want to leave the chat?</string>
+    <string name="disconnect_message_pos">YES</string>
+    <string name="disconnect_message_neg">No</string>
+    <string name="chat_options_title">Options</string>
+    <string name="chat_options_neg">Cancel</string>
+    <string name="sending_message_disconnected">Can\'t sent message while disconnected.</string>
+    <string name="no_bluetooth">No Bluetooth available</string>
+    <string name="connection_failed">Connecting failed</string>
+    <string name="bluetooth_enabled">Bluetooth enabled</string>
+    <string name="bluetooth_disabled">Bluetooth disabled</string>
+    <string name="bluetooth_enable_cancelled">Bluetooth enabling cancelled</string>
+    <string name="connect_to_failed">Connecting to device %1$s failed!</string>
 </resources>
