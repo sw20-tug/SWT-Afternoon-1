@@ -17,6 +17,11 @@ class ChatEntry(private var message: String, var isByMe: Boolean, var isBySystem
         return df.format(timestamp)
     }
 
+    fun getFormattedEditTimestamp(): String {
+        val df = SimpleDateFormat("HH:mm", Locale.US)
+        return df.format(editTimestamp!!)
+    }
+
     fun getMessage(): String {
         return message
     }

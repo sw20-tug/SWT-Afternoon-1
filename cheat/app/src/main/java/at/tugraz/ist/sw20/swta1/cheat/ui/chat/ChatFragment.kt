@@ -71,7 +71,7 @@ class ChatFragment : Fragment() {
             }
         }
 
-        chatAdapter = ChatHistoryAdapter(viewModel.getChatEntries())
+        chatAdapter = ChatHistoryAdapter(viewModel.getChatEntries(), context!!)
 
         recyclerView = root.findViewById<RecyclerView>(R.id.chat_history).apply {
             layoutManager = LinearLayoutManager(context!!)
