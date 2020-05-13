@@ -14,6 +14,7 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -45,7 +46,7 @@ class ChatFragment : Fragment() {
     private val RESULT_SELECT_IMAGE = 1
     private val RESULT_CAPTURE_IMAGE = 2
 
-    private lateinit var currentPhotoPath: String
+    private var currentPhoto: File? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
@@ -197,24 +198,24 @@ class ChatFragment : Fragment() {
 
                 val photoFile: File? = try {
                     val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-                    val storageDir: File? = context!!.getExternalFilesDir(Environment.DIRECTORY_DCIM)
+                    val storageDir: File? = context!!.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
 
-                    File.createTempFile(
+                    val file = File.createTempFile(
                             "IMG_${timeStamp}",
                             ".jpg",
                             storageDir
-                    ).apply {
-                        currentPhotoPath = absolutePath
-                    }
+                    )
+                    
+                    currentPhoto = File(storageDir, file.name)
+                    file
                 } catch (ex: IOException) {
-                    currentPhotoPath = ""
                     dialog.cancel()
                     Toast.makeText(context, "Creating image file failed.", Toast.LENGTH_SHORT).show()
                     null
                 }
 
                 photoFile?.also {
-                    val photoUri = FileProvider.getUriForFile(context!!, activity!!.applicationContext.packageName + "fileprovider", it);
+                    val photoUri = FileProvider.getUriForFile(context!!, context!!.packageName + ".provider", it);
                     intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
                     dialog.cancel()
                     startActivityForResult(intent, RESULT_CAPTURE_IMAGE)
@@ -275,14 +276,17 @@ class ChatFragment : Fragment() {
             }
         }
         
-        if(resultCode == RESULT_OK && data != null) {
-            if(requestCode == RESULT_SELECT_IMAGE) {
+        if(resultCode == RESULT_OK) {
+            if(requestCode == RESULT_SELECT_IMAGE && data != null) {
                 Log.d("Image", "Image selected from gallery")
                 sendImage(MediaStore.Images.Media.getBitmap(context?.contentResolver, data.data!!))
-            } else if(requestCode == RESULT_CAPTURE_IMAGE) {
+            } else if(requestCode == RESULT_CAPTURE_IMAGE && currentPhoto != null) {
                 Log.d("Image", "Image taken with camera")
 
-                sendImage(MediaStore.Images.Media.getBitmap(context!!.getContentResolver(), Uri.parse(currentPhotoPath)))
+                sendImage(MediaStore.Images.Media.getBitmap(context!!.contentResolver,
+                    FileProvider.getUriForFile(context!!, context!!.packageName + ".provider", currentPhoto!!)))
+                
+                currentPhoto?.delete()
             }
         }
     }
