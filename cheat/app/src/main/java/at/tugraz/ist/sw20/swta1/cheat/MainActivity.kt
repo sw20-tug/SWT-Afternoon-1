@@ -45,19 +45,6 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "Enter about page", Toast.LENGTH_SHORT).show()
                 val intent = Intent(this, AboutPageActivity::class.java)
                 startActivity(intent)
-
-
-
-//                val aboutPage = AboutPage(this)
-//                    .isRTL(false)
-//                    .setImage(R.drawable.ic_launcher_foreground)
-//                    .setDescription("Version 1.0")
-//                val ref1 = Element().setTitle("Icons made by Smashicons from www.flaticon.com")
-//                val ref2 = Element().setTitle("Icons made by Freepik from www.flaticon.com")
-//                val ref3 = Element().setTitle("App icon background made with Dark Pattern Vectors by Vecteezy")
-//
-//                aboutPage.addItem(ref1).addItem(ref2).addItem(ref3)
-//                setContentView(aboutPage.create())
                 return true
             }
         }
