@@ -29,4 +29,10 @@
     <string name="send_image_option_gallery">Gallery</string>
     <string name="send_image_option_camera">Camera</string>
     <string name="about_page">About Page</string>
+
+    <string name="reference1"><div><a href="https://www.vecteezy.com/free-vector/dark-pattern">Dark Pattern Vectors by Vecteezy</a></div></string>
+    <string name="reference2"><div>Icons made by <a href="https://www.flaticon.com/authors/smashicons" title="Smashicons">Smashicons</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div></string>
+    <string name="reference3"><div>Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div></string>
+    <string name="reference4"><div>Icons made by <a href="https://www.flaticon.com/authors/pixel-perfect" title="Pixel perfect">Pixel perfect</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div></string>
+
 </resources>
