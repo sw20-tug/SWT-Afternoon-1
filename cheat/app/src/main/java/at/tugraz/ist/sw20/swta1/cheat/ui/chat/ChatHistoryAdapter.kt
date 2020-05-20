@@ -6,6 +6,7 @@ import android.view.ContextMenu
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import at.tugraz.ist.sw20.swta1.cheat.R
@@ -22,16 +23,20 @@ class ChatHistoryAdapter(private val dataSource: ArrayList<ChatEntry>, private v
 
     override fun onBindViewHolder(holder: ChatViewHolder, position: Int) {
         val chatEntry = dataSource[position]
-        val tvMessage = holder.view.findViewById<TextView>(R.id.chat_message)
-        tvMessage.text = chatEntry.getMessage()
-
-        if (chatEntry.isDeleted()) {
-            tvMessage.setTypeface(null, Typeface.ITALIC)
+        
+        if(chatEntry.isImage() && !chatEntry.isDeleted()) {
+            holder.view.findViewById<ImageView>(R.id.chat_image).setImageBitmap(chatEntry.getImage())
+        } else {
+            val tvMessage = holder.view.findViewById<TextView>(R.id.chat_message)
+            tvMessage.text = chatEntry.getMessage()
+            
+            if (chatEntry.isDeleted()) {
+                tvMessage.setTypeface(null, Typeface.ITALIC)
+            } else {
+                tvMessage.setTypeface(null, Typeface.NORMAL)
+            }
         }
-        else {
-            tvMessage.setTypeface(null, Typeface.NORMAL)
-        }
-
+        
         holder.view.findViewById<TextView>(R.id.chat_timestamp).text = chatEntry.getFormattedTimestamp()
 
         if (!chatEntry.isSystemMessage()) {
@@ -48,13 +53,17 @@ class ChatHistoryAdapter(private val dataSource: ArrayList<ChatEntry>, private v
     }
 
     override fun getItemViewType(position: Int): Int {
+        val item = dataSource[position]
         var layout = R.layout.item_chat_message_by_other
-        if(dataSource[position].isSystemMessage())
-        {
+        if(item.isSystemMessage()) {
             layout = R.layout.item_chat_message_by_system
-        }
-        else if(dataSource[position].isWrittenByMe()) {
-            layout = R.layout.item_chat_message_by_me
+        } else if(item.isWrittenByMe()) {
+            if(item.isImage() && !item.isDeleted())
+                layout = R.layout.item_chat_message_by_me_image
+            else
+                layout = R.layout.item_chat_message_by_me
+        } else if(item.isImage() && !item.isDeleted()) {
+            layout = R.layout.item_chat_message_by_other_image
         }
 
         return layout

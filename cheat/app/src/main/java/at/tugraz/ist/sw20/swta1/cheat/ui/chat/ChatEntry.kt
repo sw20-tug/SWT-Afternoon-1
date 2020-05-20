@@ -1,18 +1,23 @@
 package at.tugraz.ist.sw20.swta1.cheat.ui.chat
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.content.Context
 import at.tugraz.ist.sw20.swta1.cheat.R
 import java.io.Serializable
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ChatEntry(private var message: String, var isByMe: Boolean, var isBySystem: Boolean,
+class ChatEntry(private var message: String, private val image: ByteArray, var isByMe: Boolean, var isBySystem: Boolean,
                 private val timestamp: Date, private val id : UUID = UUID.randomUUID())
     : Serializable, Cloneable {
 
     private var deleted = false
     private var editTimestamp: Date? = null
 
+    constructor(message: String, isByMe: Boolean, isBySystem: Boolean, timestamp: Date, id : UUID = UUID.randomUUID()) :
+            this(message, byteArrayOf(), isByMe, isBySystem, timestamp, id)
+    
     fun getFormattedTimestamp(): String {
         val df = SimpleDateFormat("HH:mm", Locale.US)
         return df.format(timestamp)
@@ -25,6 +30,14 @@ class ChatEntry(private var message: String, var isByMe: Boolean, var isBySystem
 
     fun getMessage(): String {
         return message
+    }
+    
+    fun getImage(): Bitmap {
+        return BitmapFactory.decodeByteArray(image, 0, image.size)
+    }
+    
+    fun isImage(): Boolean {
+        return image.isNotEmpty()
     }
 
     fun getMessageShortened(context: Context): String {

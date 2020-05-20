@@ -1,8 +1,6 @@
 package at.tugraz.ist.sw20.swta1.cheat
 
 import android.os.Bundle
-import android.util.Log
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import at.tugraz.ist.sw20.swta1.cheat.bluetooth.BluetoothService
@@ -37,14 +35,14 @@ class ChatActivity : AppCompatActivity() {
         builder.setTitle(getString(R.string.disconnect_message_title))
         builder.setMessage(getString(R.string.disconnect_message_message))
 
-        builder.setPositiveButton(getString(R.string.disconnect_message_pos)){dialog, which ->
+        builder.setPositiveButton(getString(R.string.dialog_option_yes)){ dialog, which ->
             val chatEntry = ChatEntry(getString(R.string.partner_disconnected), true, true, Date())
             BluetoothService.sendMessage(chatEntry)
             BluetoothService.disconnect()
             super.onBackPressed()
         }
 
-        builder.setNegativeButton(getString(R.string.disconnect_message_neg)){_,_ -> }
+        builder.setNegativeButton(getString(R.string.dialog_option_no)){ _, _ -> }
 
         val dialog: AlertDialog = builder.create()
         dialog.show()

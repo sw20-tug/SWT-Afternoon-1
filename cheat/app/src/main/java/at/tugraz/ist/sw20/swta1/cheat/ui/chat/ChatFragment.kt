@@ -1,15 +1,18 @@
 package at.tugraz.ist.sw20.swta1.cheat.ui.chat
 
+import android.app.Activity.RESULT_OK
+import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -21,7 +24,11 @@ import at.tugraz.ist.sw20.swta1.cheat.bluetooth.BluetoothService
 import at.tugraz.ist.sw20.swta1.cheat.bluetooth.BluetoothState
 import at.tugraz.ist.sw20.swta1.cheat.bluetooth.IBluetoothDevice
 import kotlinx.android.synthetic.main.chat_fragment.view.*
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.IOException
 import java.util.*
+import java.text.SimpleDateFormat
 
 class ChatFragment : Fragment() {
     companion object {
@@ -36,6 +43,11 @@ class ChatFragment : Fragment() {
     private var reconnect = true
     private var chatPartner: IBluetoothDevice? = null
     private var currentEditMessage: ChatEntry? = null
+    
+    private val RESULT_SELECT_IMAGE = 1
+    private val RESULT_CAPTURE_IMAGE = 2
+
+    private var currentPhoto: File? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
@@ -136,6 +148,7 @@ class ChatFragment : Fragment() {
         (recyclerView.layoutManager as LinearLayoutManager).stackFromEnd = true
 
         initSendButton()
+        initPictureSendButton()
         initConnectionButton()
 
         return root
@@ -149,8 +162,8 @@ class ChatFragment : Fragment() {
     }
 
     private fun initConnectionButton() {
-        val connection_status = root.findViewById<TextView>(R.id.connection_status)
-        connection_status.setOnClickListener {
+        val connectionStatus = root.findViewById<TextView>(R.id.connection_status)
+        connectionStatus.setOnClickListener {
             if(BluetoothService.state == BluetoothState.CONNECTED) {
                 (activity as ChatActivity).disconnect()
             }
@@ -163,11 +176,9 @@ class ChatFragment : Fragment() {
 
         btnSend.setOnClickListener {
             val text = etMsg.text.toString().trim()
-            if (BluetoothService.state != BluetoothState.CONNECTED)
-            {
+            if (BluetoothService.state != BluetoothState.CONNECTED) {
                 Toast.makeText(context, getString(R.string.sending_message_disconnected), Toast.LENGTH_SHORT).show()
-            }
-            else if (text.isNotBlank()) {
+            } else if (text.isNotBlank()) {
                 var chatEntry = currentEditMessage
                 if(chatEntry != null) {
                     chatEntry.edit(text)
@@ -183,6 +194,113 @@ class ChatFragment : Fragment() {
                     recyclerView.smoothScrollToPosition(scrollPosition)
                 }
                 etMsg.text.clear()
+            }
+        }
+    }
+    
+    private fun initPictureSendButton() {
+        val imageBtn = root.item_text_entry_field.findViewById<ImageButton>(R.id.image_select)
+    
+        imageBtn.setOnClickListener {
+            
+            val layout = layoutInflater.inflate(R.layout.dialog_choose_image_src, null) as View
+            val dialog = AlertDialog.Builder(context!!).create()
+            dialog.setView(layout)
+            
+            layout.findViewById<Button>(R.id.dialog_image_src_camera).setOnClickListener {
+                val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+
+                val photoFile: File? = try {
+                    val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+                    val storageDir: File? = context!!.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+
+                    val file = File.createTempFile(
+                            "IMG_${timeStamp}",
+                            ".jpg",
+                            storageDir
+                    )
+                    
+                    currentPhoto = File(storageDir, file.name)
+                    file
+                } catch (ex: IOException) {
+                    dialog.cancel()
+                    Toast.makeText(context, context!!.getString(R.string.image_creation_failed), Toast.LENGTH_SHORT).show()
+                    null
+                }
+
+                photoFile?.also {
+                    val photoUri = FileProvider.getUriForFile(context!!, context!!.packageName + ".provider", it);
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
+                    dialog.cancel()
+                    startActivityForResult(intent, RESULT_CAPTURE_IMAGE)
+                }
+            }
+    
+            layout.findViewById<Button>(R.id.dialog_image_src_gallery).setOnClickListener {
+                val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+                intent.type = "image/*"
+                dialog.cancel()
+                startActivityForResult(intent, RESULT_SELECT_IMAGE)
+            }
+            
+            dialog.show()
+        }
+    }
+    
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+    
+        fun sendImage (bitmap: Bitmap) {
+            if (BluetoothService.state != BluetoothState.CONNECTED) {
+                Toast.makeText(context, context!!.getString(R.string.sending_message_disconnected), Toast.LENGTH_SHORT).show()
+            } else {
+                val builder = AlertDialog.Builder(context!!)
+                builder.setTitle(context!!.getString(R.string.send_image_dialog_title))
+                builder.setMessage(context!!.getString(R.string.send_image_dialog))
+                
+                Log.d("Image", "Dim: ${bitmap.width}x${bitmap.height}")
+    
+                builder.setPositiveButton(context!!.getString(R.string.dialog_option_yes)) { dialog, which ->
+                    Thread {
+            
+                        val bos = ByteArrayOutputStream()
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 70, bos)
+                        val array: ByteArray = bos.toByteArray()
+                        bitmap.recycle()
+                        Log.d("Image", "Image compressed, size ${array.size}")
+            
+                        val chatEntry = ChatEntry("", array, true, false, Date())
+                        val index = viewModel.insertMessage(chatEntry)
+            
+                        activity!!.runOnUiThread {
+                            val etMsg = root.item_text_entry_field.findViewById<EditText>(R.id.text_entry)
+                            etMsg.text.clear()
+                            chatAdapter.notifyDataSetChanged()
+                            recyclerView.smoothScrollToPosition(index)
+                        }
+            
+                        BluetoothService.sendMessage(chatEntry)
+                    }.start()
+                }
+    
+                builder.setNegativeButton(context!!.getString(R.string.dialog_option_no)){_,_ -> }
+    
+                val dialog: AlertDialog = builder.create()
+                dialog.show()
+            }
+        }
+        
+        if(resultCode == RESULT_OK) {
+            if(requestCode == RESULT_SELECT_IMAGE && data != null) {
+                Log.d("Image", "Image selected from gallery")
+                sendImage(MediaStore.Images.Media.getBitmap(context?.contentResolver, data.data!!))
+            } else if(requestCode == RESULT_CAPTURE_IMAGE && currentPhoto != null) {
+                Log.d("Image", "Image taken with camera")
+
+                sendImage(MediaStore.Images.Media.getBitmap(context!!.contentResolver,
+                    FileProvider.getUriForFile(context!!, context!!.packageName + ".provider", currentPhoto!!)))
+                
+                currentPhoto?.delete()
             }
         }
     }
