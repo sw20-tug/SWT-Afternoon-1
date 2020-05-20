@@ -12,8 +12,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -40,7 +42,6 @@ class ChatFragment : Fragment() {
     private lateinit var root: View
     private lateinit var chatAdapter: ChatHistoryAdapter
     private lateinit var recyclerView: RecyclerView
-    private var reconnect = true
     private var chatPartner: IBluetoothDevice? = null
     private var currentEditMessage: ChatEntry? = null
     
@@ -64,10 +65,10 @@ class ChatFragment : Fragment() {
             chatEntry.isByMe = false
             Log.i("Message", "Message received: ${chatEntry.getMessage()}")
             if (chatEntry.isBySystem && chatEntry.getMessage() == getString(R.string.partner_disconnected))  {
-                reconnect = false;
+                (activity as ChatActivity).reconnect = false;
             }
             if (chatEntry.isBySystem && chatEntry.getMessage() == getString(R.string.partner_connected))  {
-                reconnect = false;
+                (activity as ChatActivity).reconnect = true;
             }
             val scrollPosition = viewModel.insertMessage(chatEntry)
             activity!!.runOnUiThread {
@@ -81,15 +82,18 @@ class ChatFragment : Fragment() {
         BluetoothService.setOnStateChangeListener { _, newState ->
             val connection_status = root.findViewById<TextView>(R.id.connection_status)
 
-            activity!!.runOnUiThread {
+            if (!BluetoothService.isBluetoothEnabled()) {
+                (activity as ChatActivity).goBackToMainActivity()
+            }
+            activity?.runOnUiThread {
                 when (newState) {
                     BluetoothState.CONNECTED -> connection_status.text =
                         getString(R.string.connected_status)
                     BluetoothState.READY -> {
                         connection_status.text = getString(R.string.disconnected_status)
-                        if (reconnect) {
+                        if ((activity as ChatActivity).reconnect) {
                             chatPartner?.let {
-                                BluetoothService.connectToDevice(activity!!, it)
+                                BluetoothService.connectToDevice(it)
                             }
                         }
                     }
@@ -99,44 +103,12 @@ class ChatFragment : Fragment() {
             }
         }
 
-        chatAdapter = ChatHistoryAdapter(viewModel.getChatEntries(), context!!)
+        chatAdapter = ChatHistoryAdapter(viewModel.getChatEntries(), this)
 
         recyclerView = root.findViewById<RecyclerView>(R.id.chat_history).apply {
             layoutManager = LinearLayoutManager(context!!)
             adapter = chatAdapter
         }
-
-        recyclerView.addOnItemTouchListener(RecyclerItemClickListener(context, recyclerView,
-            object : RecyclerItemClickListener.OnItemClickListener{
-
-            override fun onItemClick(view: View?, position: Int) {
-            }
-
-            override fun onLongItemClick(view: View?, position: Int) {
-                val message = chatAdapter.getItemAt(position)
-                if (message.isByMe && !message.isDeleted()) {
-                    val builder = AlertDialog.Builder(activity!!)
-                    builder.setTitle(getString(R.string.chat_options_title))
-                        .setItems(R.array.message_options) { _, which ->
-                            if (which == 0) {
-                                currentEditMessage = message
-                                root.item_edit_hint.visibility = View.VISIBLE
-                                root.item_edit_hint.findViewById<TextView>(R.id.tv_edit_text).text =
-                                    message.getMessageShortened(context!!)
-                                val etMsg = root.item_text_entry_field.findViewById<EditText>(R.id.text_entry)
-                                etMsg.setText(message.getMessage())
-                            } else {
-                                deleteChatEntry(message)
-                            }
-                        }
-
-                    builder.setNegativeButton(getString(R.string.chat_options_neg)) { _, _ -> }
-
-                    val dialog: AlertDialog = builder.create()
-                    dialog.show()
-                }
-            }
-        }))
 
         root.item_edit_hint.findViewById<Button>(R.id.btn_cancel_edit).setOnClickListener {
             currentEditMessage = null
@@ -260,9 +232,8 @@ class ChatFragment : Fragment() {
                 
                 Log.d("Image", "Dim: ${bitmap.width}x${bitmap.height}")
     
-                builder.setPositiveButton(context!!.getString(R.string.dialog_option_yes)) { dialog, which ->
+                builder.setPositiveButton(context!!.getString(R.string.dialog_option_yes)) { _, _ ->
                     Thread {
-            
                         val bos = ByteArrayOutputStream()
                         bitmap.compress(Bitmap.CompressFormat.JPEG, 70, bos)
                         val array: ByteArray = bos.toByteArray()
@@ -303,5 +274,51 @@ class ChatFragment : Fragment() {
                 currentPhoto?.delete()
             }
         }
+    }
+    
+    fun showContextMenu(message: ChatEntry) {
+        if (message.isByMe && !message.isDeleted()) {
+            val builder = AlertDialog.Builder(activity!!)
+            builder.setTitle(getString(R.string.chat_options_title))
+
+            if (message.isImage()) {
+                builder.setItems(R.array.message_options_picture) { _, which ->
+                    if (which == 0) {
+                        deleteChatEntry(message)
+                    }
+                }
+            } else {
+                builder.setItems(R.array.message_options_text) { _, which ->
+                    if (which == 0) {
+                        currentEditMessage = message
+                        root.item_edit_hint.visibility = View.VISIBLE
+                        root.item_edit_hint.findViewById<TextView>(R.id.tv_edit_text).text =
+                            message.getMessageShortened(context!!)
+                        val etMsg =
+                            root.item_text_entry_field.findViewById<EditText>(R.id.text_entry)
+                        etMsg.setText(message.getMessage())
+                    } else {
+                        deleteChatEntry(message)
+                    }
+                }
+            }
+
+            builder.setNegativeButton(getString(R.string.chat_options_neg)) { _, _ -> }
+        
+            val dialog: AlertDialog = builder.create()
+            dialog.show()
+        }
+    }
+
+    fun showFullImage(image: Bitmap) {
+        root.findViewById<ConstraintLayout>(R.id.cl_chat_fragment).visibility = View.GONE
+        val imageView = root.findViewById<ImageView>(R.id.chat_history_full_image)
+        imageView.setImageBitmap(image)
+        imageView.visibility = View.VISIBLE
+    }
+
+    fun hideFullImage() {
+        root.findViewById<ConstraintLayout>(R.id.cl_chat_fragment).visibility = View.VISIBLE
+        root.findViewById<ImageView>(R.id.chat_history_full_image).visibility = View.GONE
     }
 }
