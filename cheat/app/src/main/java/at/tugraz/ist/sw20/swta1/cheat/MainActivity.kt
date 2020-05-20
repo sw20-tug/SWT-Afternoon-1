@@ -5,7 +5,12 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
+//import at.tugraz.ist.sw20.swta1.cheat.AboutPage
+import android.widget.Toast
 import at.tugraz.ist.sw20.swta1.cheat.ui.main.MainFragment
+import mehdi.sakout.aboutpage.AboutPage
 
 class MainActivity : AppCompatActivity() {
     
@@ -28,5 +33,22 @@ class MainActivity : AppCompatActivity() {
         
         //val intent = Intent(this, ChatActivity::class.java)
         //startActivity(intent)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.option_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId) {
+            R.id.about_page -> {
+                Toast.makeText(this, "Enter about page", Toast.LENGTH_SHORT).show()
+                val aboutPage = AboutPage(this).create()
+                setContentView(aboutPage)
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 }
