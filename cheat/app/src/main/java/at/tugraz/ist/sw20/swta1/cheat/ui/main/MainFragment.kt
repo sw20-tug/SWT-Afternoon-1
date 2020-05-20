@@ -84,7 +84,7 @@ class MainFragment : Fragment() {
         pullToRefreshContainer.setOnRefreshListener {
             BluetoothService.setDiscoverable(context!!)
             viewModel.nearbyDevices.observe(viewLifecycleOwner, Observer { deviceList ->
-                viewModel.bluetoothService.discoverDevices(activity!!, { device ->
+                viewModel.bluetoothService.discoverDevices({ device ->
                     if (deviceList.find { d -> d.address == device.address } == null) {
                         Log.println(Log.INFO, "Found Nearby Device: ", device.name)
                         deviceList.add(RealBluetoothDevice(device))
@@ -92,9 +92,10 @@ class MainFragment : Fragment() {
                         lvNearbyDevices.adapter = adapterNearby
                         lvNearbyDevices.addOnItemTouchListener(RecyclerItemClickListener(context, lvNearbyDevices, object : RecyclerItemClickListener.OnItemClickListener {
                             override fun onItemClick(view: View?, position: Int) {
-                                connectToSelectedDevice(activity!!,
+                                connectToSelectedDevice(
                                     adapterNearby.getDeviceAt(position),
-                                    lvNearbyDevices[position].findViewById<ProgressBar>(R.id.loading_spinner))
+                                    lvNearbyDevices[position].findViewById<ProgressBar>(R.id.loading_spinner)
+                                )
                             }
         
                             override fun onLongItemClick(view: View?, position: Int) {}
@@ -164,7 +165,7 @@ class MainFragment : Fragment() {
         }
 
         viewModel.nearbyDevices.observe(viewLifecycleOwner, Observer { deviceList ->
-            viewModel.bluetoothService.discoverDevices(activity!!, { device ->
+            viewModel.bluetoothService.discoverDevices({ device ->
                 if (deviceList.find { d -> d.address == device.address } == null) {
                     Log.println(Log.INFO, "Found Nearby Device: ", device.name)
                     deviceList.add(RealBluetoothDevice(device))
@@ -172,9 +173,10 @@ class MainFragment : Fragment() {
                     lvNearbyDevices.adapter = adapterNearby
                     lvNearbyDevices.addOnItemTouchListener(RecyclerItemClickListener(context, lvNearbyDevices, object : RecyclerItemClickListener.OnItemClickListener {
                         override fun onItemClick(view: View?, position: Int) {
-                            connectToSelectedDevice(activity!!,
+                            connectToSelectedDevice(
                                 adapterNearby.getDeviceAt(position),
-                                lvNearbyDevices[position].findViewById<ProgressBar>(R.id.loading_spinner))
+                                lvNearbyDevices[position].findViewById<ProgressBar>(R.id.loading_spinner)
+                            )
                         }
         
                         override fun onLongItemClick(view: View?, position: Int) {}
@@ -187,8 +189,10 @@ class MainFragment : Fragment() {
         lvPairedDevices.adapter = adapterPaired
         lvPairedDevices.addOnItemTouchListener(RecyclerItemClickListener(context, lvPairedDevices, object : RecyclerItemClickListener.OnItemClickListener {
             override fun onItemClick(view: View?, position: Int) {
-                connectToSelectedDevice(activity!!, adapterPaired.getDeviceAt(position),
-                    lvPairedDevices[position].findViewById<ProgressBar>(R.id.loading_spinner))
+                connectToSelectedDevice(
+                    adapterPaired.getDeviceAt(position),
+                    lvPairedDevices[position].findViewById<ProgressBar>(R.id.loading_spinner)
+                )
             }
         
             override fun onLongItemClick(view: View?, position: Int) {}
@@ -212,7 +216,10 @@ class MainFragment : Fragment() {
         }
     }
 
-    private fun connectToSelectedDevice(activity: Activity, device: IBluetoothDevice, loadingIndicator: ProgressBar) {
+    private fun connectToSelectedDevice(
+        device: IBluetoothDevice,
+        loadingIndicator: ProgressBar
+    ) {
         synchronized(this) {
             if (currentConnectingIndicator == null) {
                 loadingIndicator.visibility = View.VISIBLE
@@ -223,7 +230,7 @@ class MainFragment : Fragment() {
         pullToRefreshContainer.isRefreshing = false
 
         Log.d("Connecting", "Clicked on device '${device.name}'")
-        if(!viewModel.bluetoothService.connectToDevice(activity, device)) {
+        if(!viewModel.bluetoothService.connectToDevice(device)) {
             Toast.makeText(context, getString(R.string.connect_to_failed, device.name),
                 Toast.LENGTH_LONG).show()
             Log.e("Connecting", getString(R.string.connect_to_failed, device.name))

@@ -42,7 +42,6 @@ class ChatFragment : Fragment() {
     private lateinit var root: View
     private lateinit var chatAdapter: ChatHistoryAdapter
     private lateinit var recyclerView: RecyclerView
-    private var reconnect = true
     private var chatPartner: IBluetoothDevice? = null
     private var currentEditMessage: ChatEntry? = null
     
@@ -66,10 +65,10 @@ class ChatFragment : Fragment() {
             chatEntry.isByMe = false
             Log.i("Message", "Message received: ${chatEntry.getMessage()}")
             if (chatEntry.isBySystem && chatEntry.getMessage() == getString(R.string.partner_disconnected))  {
-                reconnect = false;
+                (activity as ChatActivity).reconnect = false;
             }
             if (chatEntry.isBySystem && chatEntry.getMessage() == getString(R.string.partner_connected))  {
-                reconnect = false;
+                (activity as ChatActivity).reconnect = true;
             }
             val scrollPosition = viewModel.insertMessage(chatEntry)
             activity!!.runOnUiThread {
@@ -83,15 +82,18 @@ class ChatFragment : Fragment() {
         BluetoothService.setOnStateChangeListener { _, newState ->
             val connection_status = root.findViewById<TextView>(R.id.connection_status)
 
-            activity!!.runOnUiThread {
+            if (!BluetoothService.isBluetoothEnabled()) {
+                (activity as ChatActivity).goBackToMainActivity()
+            }
+            activity?.runOnUiThread {
                 when (newState) {
                     BluetoothState.CONNECTED -> connection_status.text =
                         getString(R.string.connected_status)
                     BluetoothState.READY -> {
                         connection_status.text = getString(R.string.disconnected_status)
-                        if (reconnect) {
+                        if ((activity as ChatActivity).reconnect) {
                             chatPartner?.let {
-                                BluetoothService.connectToDevice(activity!!, it)
+                                BluetoothService.connectToDevice(it)
                             }
                         }
                     }
@@ -230,9 +232,8 @@ class ChatFragment : Fragment() {
                 
                 Log.d("Image", "Dim: ${bitmap.width}x${bitmap.height}")
     
-                builder.setPositiveButton(context!!.getString(R.string.dialog_option_yes)) { dialog, which ->
+                builder.setPositiveButton(context!!.getString(R.string.dialog_option_yes)) { _, _ ->
                     Thread {
-            
                         val bos = ByteArrayOutputStream()
                         bitmap.compress(Bitmap.CompressFormat.JPEG, 70, bos)
                         val array: ByteArray = bos.toByteArray()
