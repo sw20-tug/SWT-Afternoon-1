@@ -47,6 +47,10 @@ object BluetoothService {
         this.onMessageReceive = onMessageReceive
     }
 
+    fun isBluetoothEnabled() : Boolean {
+        return adapter.isEnabled
+    }
+
     fun setDiscoverable(context: Context,timeInSeconds : Int = 300) {
         val intent = Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE)
         intent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, timeInSeconds)
