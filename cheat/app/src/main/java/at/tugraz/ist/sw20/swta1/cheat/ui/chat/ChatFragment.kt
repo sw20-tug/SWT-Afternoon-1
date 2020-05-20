@@ -15,6 +15,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -106,38 +107,6 @@ class ChatFragment : Fragment() {
             layoutManager = LinearLayoutManager(context!!)
             adapter = chatAdapter
         }
-
-        recyclerView.addOnItemTouchListener(RecyclerItemClickListener(context, recyclerView,
-            object : RecyclerItemClickListener.OnItemClickListener{
-
-            override fun onItemClick(view: View?, position: Int) {
-            }
-
-            override fun onLongItemClick(view: View?, position: Int) {
-                val message = chatAdapter.getItemAt(position)
-                if (message.isByMe && !message.isDeleted()) {
-                    val builder = AlertDialog.Builder(activity!!)
-                    builder.setTitle(getString(R.string.chat_options_title))
-                        .setItems(R.array.message_options) { _, which ->
-                            if (which == 0) {
-                                currentEditMessage = message
-                                root.item_edit_hint.visibility = View.VISIBLE
-                                root.item_edit_hint.findViewById<TextView>(R.id.tv_edit_text).text =
-                                    message.getMessageShortened(context!!)
-                                val etMsg = root.item_text_entry_field.findViewById<EditText>(R.id.text_entry)
-                                etMsg.setText(message.getMessage())
-                            } else {
-                                deleteChatEntry(message)
-                            }
-                        }
-
-                    builder.setNegativeButton(getString(R.string.chat_options_neg)) { _, _ -> }
-
-                    val dialog: AlertDialog = builder.create()
-                    dialog.show()
-                }
-            }
-        }))
 
         root.item_edit_hint.findViewById<Button>(R.id.btn_cancel_edit).setOnClickListener {
             currentEditMessage = null
@@ -303,6 +272,30 @@ class ChatFragment : Fragment() {
                 
                 currentPhoto?.delete()
             }
+        }
+    }
+    
+    fun showContextMenu(message: ChatEntry) {
+        if (message.isByMe && !message.isDeleted()) {
+            val builder = AlertDialog.Builder(activity!!)
+            builder.setTitle(getString(R.string.chat_options_title))
+                .setItems(R.array.message_options) { _, which ->
+                    if (which == 0) {
+                        currentEditMessage = message
+                        root.item_edit_hint.visibility = View.VISIBLE
+                        root.item_edit_hint.findViewById<TextView>(R.id.tv_edit_text).text =
+                            message.getMessageShortened(context!!)
+                        val etMsg = root.item_text_entry_field.findViewById<EditText>(R.id.text_entry)
+                        etMsg.setText(message.getMessage())
+                    } else {
+                        deleteChatEntry(message)
+                    }
+                }
+        
+            builder.setNegativeButton(getString(R.string.chat_options_neg)) { _, _ -> }
+        
+            val dialog: AlertDialog = builder.create()
+            dialog.show()
         }
     }
 

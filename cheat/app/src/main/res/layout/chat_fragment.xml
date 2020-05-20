@@ -53,6 +53,7 @@
         android:visibility="gone"
         android:id="@+id/chat_history_full_image"
         android:contentDescription="@string/full_image_description"
+        android:background="@color/primaryDarkColor"
         android:adjustViewBounds="true"
         android:scaleType="fitCenter">
     </ImageView>

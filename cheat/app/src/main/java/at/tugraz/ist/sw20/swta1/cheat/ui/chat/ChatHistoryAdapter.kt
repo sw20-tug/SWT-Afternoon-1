@@ -1,6 +1,7 @@
 package at.tugraz.ist.sw20.swta1.cheat.ui.chat
 
 import android.graphics.Typeface
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,12 +23,21 @@ class ChatHistoryAdapter(private val dataSource: ArrayList<ChatEntry>, private v
 
     override fun onBindViewHolder(holder: ChatViewHolder, position: Int) {
         val chatEntry = dataSource[position]
+    
+        holder.view.setOnLongClickListener {
+            fragment.showContextMenu(chatEntry)
+            true
+        }
         
         if(chatEntry.isImage() && !chatEntry.isDeleted()) {
             val imageView = holder.view.findViewById<ImageView>(R.id.chat_image)
             imageView.setImageBitmap(chatEntry.getImage())
             imageView.setOnClickListener {
+                Log.d("Image", "Clicked on image")
                 fragment.showFullImage(chatEntry.getImage())
+            }
+            imageView.setOnLongClickListener {v ->
+                (v.parent.parent as View).performLongClick()
             }
         } else {
             val tvMessage = holder.view.findViewById<TextView>(R.id.chat_message)
