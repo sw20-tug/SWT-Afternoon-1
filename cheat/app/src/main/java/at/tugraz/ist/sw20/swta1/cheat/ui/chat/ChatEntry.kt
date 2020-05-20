@@ -15,8 +15,8 @@ class ChatEntry(private var message: String, private val image: ByteArray, var i
     private var deleted = false
     private var editTimestamp: Date? = null
 
-    constructor(message: String, isByMe: Boolean, isBySystem: Boolean, timestamp: Date) :
-            this(message, byteArrayOf(), isByMe, isBySystem, timestamp)
+    constructor(message: String, isByMe: Boolean, isBySystem: Boolean, timestamp: Date, id : UUID = UUID.randomUUID()) :
+            this(message, byteArrayOf(), isByMe, isBySystem, timestamp, id)
     
     fun getFormattedTimestamp(): String {
         val df = SimpleDateFormat("HH:mm", Locale.US)
