@@ -91,7 +91,7 @@ class ChatFragment : Fragment() {
                         connection_status.text = getString(R.string.disconnected_status)
                         if ((activity as ChatActivity).reconnect) {
                             chatPartner?.let {
-                                BluetoothService.connectToDevice(activity!!, it)
+                                BluetoothService.connectToDevice(it)
                             }
                         }
                     }
@@ -262,9 +262,8 @@ class ChatFragment : Fragment() {
                 
                 Log.d("Image", "Dim: ${bitmap.width}x${bitmap.height}")
     
-                builder.setPositiveButton(context!!.getString(R.string.dialog_option_yes)) { dialog, which ->
+                builder.setPositiveButton(context!!.getString(R.string.dialog_option_yes)) { _, _ ->
                     Thread {
-            
                         val bos = ByteArrayOutputStream()
                         bitmap.compress(Bitmap.CompressFormat.JPEG, 70, bos)
                         val array: ByteArray = bos.toByteArray()

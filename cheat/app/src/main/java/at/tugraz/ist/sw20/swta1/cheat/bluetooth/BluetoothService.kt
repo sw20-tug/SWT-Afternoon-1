@@ -1,7 +1,6 @@
 package at.tugraz.ist.sw20.swta1.cheat.bluetooth
 
 import android.Manifest
-import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothServerSocket
@@ -12,6 +11,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.util.Log
+import at.tugraz.ist.sw20.swta1.cheat.MainActivity
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
@@ -21,6 +21,7 @@ import java.util.*
 
 
 object BluetoothService {
+    var activity : MainActivity? = null
     private val adapter = BluetoothAdapter.getDefaultAdapter()
     private val tag = "BluetoothService"
     private val connectionTag = "$tag/Connection"
@@ -78,20 +79,20 @@ object BluetoothService {
         acceptConnection!!.start()
     }
     
-    fun discoverDevices(activity: Activity, onDeviceFound: (BluetoothDevice) -> Unit, onDiscoveryStopped: () -> Unit) {
+    fun discoverDevices(onDeviceFound: (BluetoothDevice) -> Unit, onDiscoveryStopped: () -> Unit) {
         if(state != BluetoothState.READY) {
             return
         }
         if(receiver != null) {
-            activity.unregisterReceiver(receiver)
+            activity?.unregisterReceiver(receiver)
             receiver = null
         }
         if (adapter.isDiscovering) {
             adapter.cancelDiscovery()
         }
         
-        if (activity.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            activity.requestPermissions(
+        if (activity?.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            activity?.requestPermissions(
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
                 1 /* <- is for identifying this request, random number */
             )
@@ -124,26 +125,26 @@ object BluetoothService {
             }
         }
         
-        activity.registerReceiver(receiver, IntentFilter(BluetoothDevice.ACTION_FOUND))
-        activity.registerReceiver(finishedReceiver, IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED))
+        activity?.registerReceiver(receiver, IntentFilter(BluetoothDevice.ACTION_FOUND))
+        activity?.registerReceiver(finishedReceiver, IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED))
         if(!adapter.startDiscovery()) {
             Log.println(Log.ERROR, tag, "Error starting discovery")
         }
         Log.println(Log.DEBUG, tag, "Start discovery")
     }
     
-    fun stopDiscovery(activity: Activity) {
+    fun stopDiscovery() {
         adapter.cancelDiscovery()
         updateState(BluetoothState.READY)
         Log.println(Log.DEBUG, tag, "Stop discovery")
         if (receiver != null) {
-            activity.unregisterReceiver(receiver)
+            activity?.unregisterReceiver(receiver)
             receiver = null
         }
     }
     
-    fun connectToDevice(activity: Activity, device: IBluetoothDevice): Boolean {
-        stopDiscovery(activity)
+    fun connectToDevice(device: IBluetoothDevice): Boolean {
+        stopDiscovery()
         synchronized(this) {
             if (state != BluetoothState.READY) {
                 return false
@@ -318,7 +319,7 @@ object BluetoothService {
                 Log.e(connectionTag, "Failed to create server socket")
                 return
             }
-            var clientSocket: BluetoothSocket? = null
+            var clientSocket: BluetoothSocket?
             
             while (BluetoothService.state == BluetoothState.READY) {
                 try {
@@ -331,6 +332,7 @@ object BluetoothService {
                     Log.i(connectionTag, "Incoming socket connection established")
                     var ready = true
                     synchronized(BluetoothService) {
+                        stopDiscovery()
                         if (BluetoothService.state != BluetoothState.READY) {
                             ready = false
                         } else {
@@ -397,8 +399,6 @@ object BluetoothService {
         
         override fun run() {
             Log.i(connectionTag, "Connection to ${device.name} established, ready to send/receive")
-            val buffer = ByteArray(1024)
-            var bytesRead = 0
             val inputStream = ObjectInputStream(inStream)
             while (BluetoothService.state == BluetoothState.CONNECTED) {
                 try {
