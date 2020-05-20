@@ -7,10 +7,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-//import at.tugraz.ist.sw20.swta1.cheat.AboutPage
 import android.widget.Toast
 import at.tugraz.ist.sw20.swta1.cheat.ui.main.MainFragment
-import mehdi.sakout.aboutpage.AboutPage
 
 class MainActivity : AppCompatActivity() {
     
@@ -44,8 +42,21 @@ class MainActivity : AppCompatActivity() {
         when(item.itemId) {
             R.id.about_page -> {
                 Toast.makeText(this, "Enter about page", Toast.LENGTH_SHORT).show()
-                val aboutPage = AboutPage(this).create()
-                setContentView(aboutPage)
+                val intent = Intent(this, AboutPageActivity::class.java)
+                startActivity(intent)
+
+
+
+//                val aboutPage = AboutPage(this)
+//                    .isRTL(false)
+//                    .setImage(R.drawable.ic_launcher_foreground)
+//                    .setDescription("Version 1.0")
+//                val ref1 = Element().setTitle("Icons made by Smashicons from www.flaticon.com")
+//                val ref2 = Element().setTitle("Icons made by Freepik from www.flaticon.com")
+//                val ref3 = Element().setTitle("App icon background made with Dark Pattern Vectors by Vecteezy")
+//
+//                aboutPage.addItem(ref1).addItem(ref2).addItem(ref3)
+//                setContentView(aboutPage.create())
                 return true
             }
         }
