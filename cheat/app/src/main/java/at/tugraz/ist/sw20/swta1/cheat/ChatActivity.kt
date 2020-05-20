@@ -9,7 +9,7 @@ import at.tugraz.ist.sw20.swta1.cheat.ui.chat.ChatFragment
 import java.util.*
 
 class ChatActivity : AppCompatActivity() {
-
+    var reconnect = true
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
@@ -38,13 +38,18 @@ class ChatActivity : AppCompatActivity() {
         builder.setPositiveButton(getString(R.string.dialog_option_yes)){ dialog, which ->
             val chatEntry = ChatEntry(getString(R.string.partner_disconnected), true, true, Date())
             BluetoothService.sendMessage(chatEntry)
+            reconnect = false
             BluetoothService.disconnect()
-            super.onBackPressed()
+            goBackToMainActivity()
         }
 
         builder.setNegativeButton(getString(R.string.dialog_option_no)){ _, _ -> }
 
         val dialog: AlertDialog = builder.create()
         dialog.show()
+    }
+
+    fun goBackToMainActivity() {
+        super.onBackPressed()
     }
 }
