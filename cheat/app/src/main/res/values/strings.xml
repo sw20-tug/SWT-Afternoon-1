@@ -28,4 +28,6 @@
     <string name="image_creation_failed">Creating temporary image file failed</string>
     <string name="send_image_option_gallery">Gallery</string>
     <string name="send_image_option_camera">Camera</string>
+    <string name="full_image_description">Maximized Image</string>
+
 </resources>
