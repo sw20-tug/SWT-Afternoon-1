@@ -280,19 +280,29 @@ class ChatFragment : Fragment() {
         if (message.isByMe && !message.isDeleted()) {
             val builder = AlertDialog.Builder(activity!!)
             builder.setTitle(getString(R.string.chat_options_title))
-                .setItems(R.array.message_options) { _, which ->
+
+            if (message.isImage()) {
+                builder.setItems(R.array.message_options_picture) { _, which ->
+                    if (which == 0) {
+                        deleteChatEntry(message)
+                    }
+                }
+            } else {
+                builder.setItems(R.array.message_options_text) { _, which ->
                     if (which == 0) {
                         currentEditMessage = message
                         root.item_edit_hint.visibility = View.VISIBLE
                         root.item_edit_hint.findViewById<TextView>(R.id.tv_edit_text).text =
                             message.getMessageShortened(context!!)
-                        val etMsg = root.item_text_entry_field.findViewById<EditText>(R.id.text_entry)
+                        val etMsg =
+                            root.item_text_entry_field.findViewById<EditText>(R.id.text_entry)
                         etMsg.setText(message.getMessage())
                     } else {
                         deleteChatEntry(message)
                     }
                 }
-        
+            }
+
             builder.setNegativeButton(getString(R.string.chat_options_neg)) { _, _ -> }
         
             val dialog: AlertDialog = builder.create()

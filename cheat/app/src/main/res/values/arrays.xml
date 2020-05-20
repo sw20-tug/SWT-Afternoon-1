@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <array name="message_options">
+    <array name="message_options_text">
         <item>Edit</item>
+        <item>Delete</item>
+    </array>
+    <array name="message_options_picture">
         <item>Delete</item>
     </array>
 </resources>
