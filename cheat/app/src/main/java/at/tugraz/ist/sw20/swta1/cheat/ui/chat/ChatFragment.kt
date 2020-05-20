@@ -83,7 +83,7 @@ class ChatFragment : Fragment() {
             if (!BluetoothService.isBluetoothEnabled()) {
                 (activity as ChatActivity).goBackToMainActivity()
             }
-            activity!!.runOnUiThread {
+            activity?.runOnUiThread {
                 when (newState) {
                     BluetoothState.CONNECTED -> connection_status.text =
                         getString(R.string.connected_status)

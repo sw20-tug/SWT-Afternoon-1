@@ -26,6 +26,7 @@ object BluetoothService {
     private val tag = "BluetoothService"
     private val connectionTag = "$tag/Connection"
     private var receiver: BroadcastReceiver? = null
+    private var finishedReceiver: BroadcastReceiver? = null
     private var initConnection: InitConnection? = null
     private var acceptConnection: AcceptConnection? = null
     private var currentConnection: CurrentConnection? = null
@@ -87,6 +88,10 @@ object BluetoothService {
             activity?.unregisterReceiver(receiver)
             receiver = null
         }
+        if(finishedReceiver != null) {
+            activity?.unregisterReceiver(finishedReceiver)
+            finishedReceiver = null
+        }
         if (adapter.isDiscovering) {
             adapter.cancelDiscovery()
         }
@@ -118,7 +123,7 @@ object BluetoothService {
             }
         }
 
-        val finishedReceiver = object : BroadcastReceiver() {
+        finishedReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 Log.println(Log.DEBUG, "Bluetooth", "Discovery stopped")
                 onDiscoveryStopped()
@@ -140,6 +145,10 @@ object BluetoothService {
         if (receiver != null) {
             activity?.unregisterReceiver(receiver)
             receiver = null
+        }
+        if (finishedReceiver != null) {
+            activity?.unregisterReceiver(finishedReceiver)
+            finishedReceiver = null
         }
     }
     
