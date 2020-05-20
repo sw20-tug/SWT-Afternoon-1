@@ -4,6 +4,7 @@
     android:layout_width="match_parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/cl_chat_fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         xmlns:app="http://schemas.android.com/apk/res-auto">
@@ -51,7 +52,9 @@
         android:layout_height="match_parent"
         android:visibility="gone"
         android:id="@+id/chat_history_full_image"
-        android:contentDescription="@string/full_image_description">
+        android:contentDescription="@string/full_image_description"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter">
     </ImageView>
 
 </FrameLayout>

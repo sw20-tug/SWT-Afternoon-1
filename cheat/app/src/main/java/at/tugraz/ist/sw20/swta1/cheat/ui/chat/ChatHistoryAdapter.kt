@@ -1,17 +1,16 @@
 package at.tugraz.ist.sw20.swta1.cheat.ui.chat
 
-import android.content.Context
 import android.graphics.Typeface
-import android.view.ContextMenu
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import at.tugraz.ist.sw20.swta1.cheat.R
 
-class ChatHistoryAdapter(private val dataSource: ArrayList<ChatEntry>, private val context: Context)
+class ChatHistoryAdapter(private val dataSource: ArrayList<ChatEntry>, private val fragment: ChatFragment)
     : RecyclerView.Adapter<ChatHistoryAdapter.ChatViewHolder>() {
 
     class ChatViewHolder(val view: View) : RecyclerView.ViewHolder(view)
@@ -25,7 +24,11 @@ class ChatHistoryAdapter(private val dataSource: ArrayList<ChatEntry>, private v
         val chatEntry = dataSource[position]
         
         if(chatEntry.isImage() && !chatEntry.isDeleted()) {
-            holder.view.findViewById<ImageView>(R.id.chat_image).setImageBitmap(chatEntry.getImage())
+            val imageView = holder.view.findViewById<ImageView>(R.id.chat_image)
+            imageView.setImageBitmap(chatEntry.getImage())
+            imageView.setOnClickListener {
+                fragment.showFullImage(chatEntry.getImage())
+            }
         } else {
             val tvMessage = holder.view.findViewById<TextView>(R.id.chat_message)
             tvMessage.text = chatEntry.getMessage()
@@ -42,7 +45,7 @@ class ChatHistoryAdapter(private val dataSource: ArrayList<ChatEntry>, private v
         if (!chatEntry.isSystemMessage()) {
             val etEditTimestamp = holder.view.findViewById<TextView>(R.id.chat_edit_timestamp)
             if (chatEntry.isEdited()) {
-                etEditTimestamp.text = context.getString(R.string.edit_timestamp,
+                etEditTimestamp.text = fragment.getString(R.string.edit_timestamp,
                     chatEntry.getFormattedEditTimestamp())
                 etEditTimestamp.visibility = View.VISIBLE
             }

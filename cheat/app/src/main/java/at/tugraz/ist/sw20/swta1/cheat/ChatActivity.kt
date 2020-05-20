@@ -1,6 +1,8 @@
 package at.tugraz.ist.sw20.swta1.cheat
 
 import android.os.Bundle
+import android.view.View
+import android.widget.ImageView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import at.tugraz.ist.sw20.swta1.cheat.bluetooth.BluetoothService
@@ -26,7 +28,13 @@ class ChatActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        disconnect()
+        val imageView = (supportFragmentManager.fragments[0] as ChatFragment).view!!
+            .findViewById<ImageView>(R.id.chat_history_full_image)
+        if (imageView.visibility == View.VISIBLE) {
+            (supportFragmentManager.fragments[0] as ChatFragment).hideFullImage()
+        } else {
+            disconnect()
+        }
     }
 
     fun disconnect()

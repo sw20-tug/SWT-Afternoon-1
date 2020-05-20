@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -99,7 +100,7 @@ class ChatFragment : Fragment() {
             }
         }
 
-        chatAdapter = ChatHistoryAdapter(viewModel.getChatEntries(), context!!)
+        chatAdapter = ChatHistoryAdapter(viewModel.getChatEntries(), this)
 
         recyclerView = root.findViewById<RecyclerView>(R.id.chat_history).apply {
             layoutManager = LinearLayoutManager(context!!)
@@ -303,5 +304,17 @@ class ChatFragment : Fragment() {
                 currentPhoto?.delete()
             }
         }
+    }
+
+    fun showFullImage(image: Bitmap) {
+        root.findViewById<ConstraintLayout>(R.id.cl_chat_fragment).visibility = View.GONE
+        val imageView = root.findViewById<ImageView>(R.id.chat_history_full_image)
+        imageView.setImageBitmap(image)
+        imageView.visibility = View.VISIBLE
+    }
+
+    fun hideFullImage() {
+        root.findViewById<ConstraintLayout>(R.id.cl_chat_fragment).visibility = View.VISIBLE
+        root.findViewById<ImageView>(R.id.chat_history_full_image).visibility = View.GONE
     }
 }
