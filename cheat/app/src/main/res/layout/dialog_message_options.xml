@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/dialogBackground"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/message_dialog_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Options"
+        android:textStyle="bold"
+        android:textSize="12pt"
+        android:textColor="@color/primaryTextColor"
+        android:layout_margin="30dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <include
+        layout="@layout/item_icon_with_text"
+        android:id="@+id/message_dialog_edit"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_marginStart="25dp"
+        android:layout_marginTop="@dimen/margin_text"
+        app:layout_constraintStart_toStartOf="@id/message_dialog_title"
+        app:layout_constraintTop_toBottomOf="@id/message_dialog_title"
+        />
+
+    <include
+        layout="@layout/item_icon_with_text"
+        android:id="@+id/message_dialog_delete"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_marginStart="25dp"
+        app:layout_constraintStart_toStartOf="@id/message_dialog_title"
+        app:layout_constraintTop_toBottomOf="@id/message_dialog_edit"
+        />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/cancel"
+        android:textColor="@color/primaryTextColor"
+        android:background="@color/transparent"
+        android:layout_marginEnd="@dimen/margin_dialog_btn"
+        android:layout_marginBottom="@dimen/margin_text_status"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/message_dialog_delete"
+        />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -39,7 +39,7 @@ class ChatActivity : AppCompatActivity() {
 
     fun disconnect()
     {
-        val builder = AlertDialog.Builder(this)
+        val builder = AlertDialog.Builder(this) // TODO change theme
         builder.setTitle(getString(R.string.disconnect_message_title))
         builder.setMessage(getString(R.string.disconnect_message_message))
 
