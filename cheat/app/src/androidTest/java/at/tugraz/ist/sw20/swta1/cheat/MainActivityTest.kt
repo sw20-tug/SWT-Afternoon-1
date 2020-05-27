@@ -1,6 +1,5 @@
 package at.tugraz.ist.sw20.swta1.cheat
 
-import android.content.res.Resources
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
@@ -8,8 +7,7 @@ import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
-import junit.framework.Assert.assertEquals
+import junit.framework.TestCase.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -19,7 +17,7 @@ class MainActivityTest {
     @Test
     fun testComponentsPresent() {
         ActivityScenario.launch(MainActivity::class.java).onActivity { a ->
-            assertEquals("Cheat", a.supportActionBar?.title);
+            assertEquals("Cheat", a.supportActionBar?.title)
         }
 
         onView(withId(R.id.main)).check(matches(isDisplayed()))
@@ -50,7 +48,7 @@ class MainActivityTest {
 
         onView(withId(R.id.about_page_icon)).check(matches(isDisplayed()))
 
-        onView(withContentDescription("Navigate up")).perform(click());
+        onView(withContentDescription("Navigate up")).perform(click())
 
         onView(withId(R.id.main)).check(matches(isDisplayed()))
     }

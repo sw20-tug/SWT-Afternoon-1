@@ -1,13 +1,11 @@
 package at.tugraz.ist.sw20.swta1.cheat
 
-import android.content.res.Resources
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
-import junit.framework.Assert.assertEquals
+import junit.framework.TestCase.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -17,17 +15,17 @@ class AboutPageActivityTest {
 
     @Test
     fun testComponentsPresent() {
-        var credit1: String = ""
-        var credit2: String = ""
-        var credit3: String = ""
-        var credit4: String = ""
+        var credit1 = ""
+        var credit2 = ""
+        var credit3 = ""
+        var credit4 = ""
 
         ActivityScenario.launch(AboutPageActivity::class.java).onActivity { a ->
             credit1 = a.resources.getString(R.string.reference1)
             credit2 = a.resources.getString(R.string.reference2)
             credit3 = a.resources.getString(R.string.reference3)
             credit4 = a.resources.getString(R.string.reference4)
-            assertEquals("Cheat", a.supportActionBar?.title);
+            assertEquals("Cheat", a.supportActionBar?.title)
         }
 
         onView(withId(R.id.about_page_icon)).check(matches(isDisplayed()))
