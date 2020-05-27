@@ -7,8 +7,6 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
-import at.tugraz.ist.sw20.swta1.cheat.bluetooth.BluetoothService
 import at.tugraz.ist.sw20.swta1.cheat.bluetooth.BluetoothServiceProvider
 import at.tugraz.ist.sw20.swta1.cheat.ui.main.MainFragment
 
@@ -30,9 +28,6 @@ class MainActivity : AppCompatActivity() {
                 .replace(R.id.container, MainFragment.newInstance())
                 .commitNow()
         }
-        
-        //val intent = Intent(this, ChatActivity::class.java)
-        //startActivity(intent)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

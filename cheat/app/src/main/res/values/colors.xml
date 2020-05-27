@@ -12,4 +12,8 @@
     <color name="hintTextColor">#B1B1B1</color>
     <color name="separator_light">#e3e3e3</color>
     <color name="separator_dark">#000000</color>
+    <color name="dialogBackground">#284551</color>
+    <color name="dialogButton">#1F3943</color>
+
+    <color name="transparent">#00FFFFFF</color>
 </resources>
