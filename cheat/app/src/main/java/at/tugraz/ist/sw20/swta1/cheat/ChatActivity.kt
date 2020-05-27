@@ -6,6 +6,7 @@ import android.widget.ImageView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import at.tugraz.ist.sw20.swta1.cheat.bluetooth.BluetoothService
+import at.tugraz.ist.sw20.swta1.cheat.bluetooth.BluetoothServiceProvider
 import at.tugraz.ist.sw20.swta1.cheat.ui.chat.ChatEntry
 import at.tugraz.ist.sw20.swta1.cheat.ui.chat.ChatFragment
 import java.util.*
@@ -24,7 +25,7 @@ class ChatActivity : AppCompatActivity() {
         supportActionBar?.hide()
 
         val chatEntry = ChatEntry(getString(R.string.partner_connected), true, true, Date())
-        BluetoothService.sendMessage(chatEntry)
+        BluetoothServiceProvider.getBluetoothService().sendMessage(chatEntry)
     }
 
     override fun onBackPressed() {
@@ -45,9 +46,9 @@ class ChatActivity : AppCompatActivity() {
 
         builder.setPositiveButton(getString(R.string.dialog_option_yes)){ dialog, which ->
             val chatEntry = ChatEntry(getString(R.string.partner_disconnected), true, true, Date())
-            BluetoothService.sendMessage(chatEntry)
+            BluetoothServiceProvider.getBluetoothService().sendMessage(chatEntry)
             reconnect = false
-            BluetoothService.disconnect()
+            BluetoothServiceProvider.getBluetoothService().disconnect()
             goBackToMainActivity()
         }
 
@@ -58,6 +59,8 @@ class ChatActivity : AppCompatActivity() {
     }
 
     fun goBackToMainActivity() {
+        // do nothing when we receive additional messages
+        BluetoothServiceProvider.getBluetoothService().setOnMessageReceive {}
         super.onBackPressed()
     }
 }
