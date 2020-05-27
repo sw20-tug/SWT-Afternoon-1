@@ -3,6 +3,7 @@
     <dimen name="text_size_header">25sp</dimen>
     <dimen name="text_size_normal">20sp</dimen>
     <dimen name="text_size_small">12sp</dimen>
+    <dimen name="text_size_dialog_message">16sp</dimen>
 
     <dimen name="margin_text">16dp</dimen>
     <dimen name="margin_text_small">12dp</dimen>

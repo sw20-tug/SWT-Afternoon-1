@@ -24,7 +24,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/disconnect_message_message"
-        android:textSize="@dimen/text_size_normal"
+        android:textSize="@dimen/text_size_dialog_message"
         android:textColor="@color/primaryTextColor"
         android:layout_marginTop="@dimen/margin_text_small"
         app:layout_constraintTop_toBottomOf="@id/disconnect_dialog_title"
@@ -41,19 +41,19 @@
         >
 
         <Button
-            android:id="@+id/disconnect_dialog_yes"
+            android:id="@+id/disconnect_dialog_no"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/dialog_option_yes"
+            android:text="@string/dialog_option_no"
             android:background="@color/transparent"
             android:textColor="@color/primaryTextColor"
             />
 
         <Button
-            android:id="@+id/disconnect_dialog_no"
+            android:id="@+id/disconnect_dialog_yes"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/dialog_option_no"
+            android:text="@string/dialog_option_yes"
             android:background="@color/transparent"
             android:textColor="@color/primaryTextColor"
             />

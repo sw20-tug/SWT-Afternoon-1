@@ -2,6 +2,7 @@ package at.tugraz.ist.sw20.swta1.cheat
 
 import android.os.Bundle
 import android.view.View
+import android.widget.Button
 import android.widget.ImageView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -39,21 +40,22 @@ class ChatActivity : AppCompatActivity() {
 
     fun disconnect()
     {
-        val builder = AlertDialog.Builder(this) // TODO change theme
-        builder.setTitle(getString(R.string.disconnect_message_title))
-        builder.setMessage(getString(R.string.disconnect_message_message))
-
-        builder.setPositiveButton(getString(R.string.dialog_option_yes)){ dialog, which ->
+        val layout = layoutInflater.inflate(R.layout.dialog_exit_conversation, null) as View
+        val builder = AlertDialog.Builder(this)
+        builder.setView(layout)
+        val dialog: AlertDialog = builder.create()
+        layout.findViewById<Button>(R.id.disconnect_dialog_yes).setOnClickListener {
             val chatEntry = ChatEntry(getString(R.string.partner_disconnected), true, true, Date())
             BluetoothServiceProvider.getBluetoothService().sendMessage(chatEntry)
             reconnect = false
             BluetoothServiceProvider.getBluetoothService().disconnect()
             goBackToMainActivity()
+            dialog.dismiss()
+        }
+        layout.findViewById<Button>(R.id.disconnect_dialog_no).setOnClickListener {
+            dialog.dismiss()
         }
 
-        builder.setNegativeButton(getString(R.string.dialog_option_no)){ _, _ -> }
-
-        val dialog: AlertDialog = builder.create()
         dialog.show()
     }
 
