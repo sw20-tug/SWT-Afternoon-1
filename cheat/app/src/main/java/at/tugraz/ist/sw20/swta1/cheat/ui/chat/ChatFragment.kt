@@ -27,6 +27,8 @@ import at.tugraz.ist.sw20.swta1.cheat.bluetooth.BluetoothServiceProvider
 import at.tugraz.ist.sw20.swta1.cheat.bluetooth.BluetoothState
 import at.tugraz.ist.sw20.swta1.cheat.bluetooth.IBluetoothDevice
 import kotlinx.android.synthetic.main.chat_fragment.view.*
+import kotlinx.android.synthetic.main.dialog_message_options.*
+import kotlinx.android.synthetic.main.item_icon_with_text.view.*
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
@@ -279,34 +281,44 @@ class ChatFragment : Fragment() {
     
     fun showContextMenu(message: ChatEntry) {
         if (message.isByMe && !message.isDeleted()) {
+            val layout = layoutInflater.inflate(R.layout.dialog_message_options, null) as View
             val builder = AlertDialog.Builder(activity!!)
-            builder.setTitle(getString(R.string.chat_options_title))
+            builder.setView(layout)
+            layout.findViewById<TextView>(R.id.message_dialog_title).text = getString(R.string.chat_options_title)
+
+            var btnEdit = layout.findViewById<Button>(R.id.message_dialog_edit).item_text
+            btnEdit.text = getString(R.string.edit)
+            layout.findViewById<ImageView>(R.id.message_dialog_edit).item_icon.setImageResource(R.drawable.ic_edit)
+
+            var btnDelete = layout.findViewById<Button>(R.id.message_dialog_delete).item_text
+            btnDelete.text = getString(R.string.delete)
+            layout.findViewById<ImageView>(R.id.message_dialog_delete).item_icon.setImageResource(R.drawable.ic_delete)
+
+            val dialog: AlertDialog = builder.create()
 
             if (message.isImage()) {
-                builder.setItems(R.array.message_options_picture) { _, which ->
-                    if (which == 0) {
-                        deleteChatEntry(message)
-                    }
+                layout.findViewById<View>(R.id.message_dialog_edit).visibility = View.GONE
+                btnDelete.setOnClickListener {
+                    deleteChatEntry(message)
                 }
             } else {
-                builder.setItems(R.array.message_options_text) { _, which ->
-                    if (which == 0) {
-                        currentEditMessage = message
-                        root.item_edit_hint.visibility = View.VISIBLE
-                        root.item_edit_hint.findViewById<TextView>(R.id.tv_edit_text).text =
+                btnEdit.setOnClickListener {
+                    currentEditMessage = message
+                    root.item_edit_hint.visibility = View.VISIBLE
+                    root.item_edit_hint.findViewById<TextView>(R.id.tv_edit_text).text =
                             message.getMessageShortened(context!!)
-                        val etMsg =
+                    val etMsg =
                             root.item_text_entry_field.findViewById<EditText>(R.id.text_entry)
-                        etMsg.setText(message.getMessage())
-                    } else {
-                        deleteChatEntry(message)
-                    }
+                    etMsg.setText(message.getMessage())
+                    dialog.dismiss()
+                }
+                btnDelete.setOnClickListener {
+                    deleteChatEntry(message)
+                    dialog.dismiss()
                 }
             }
-
-            builder.setNegativeButton(getString(R.string.chat_options_neg)) { _, _ -> }
         
-            val dialog: AlertDialog = builder.create()
+
             dialog.show()
         }
     }

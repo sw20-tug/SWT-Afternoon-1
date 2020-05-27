@@ -11,7 +11,7 @@
         android:id="@+id/message_dialog_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Options"
+        android:text="@string/chat_options_title"
         android:textStyle="bold"
         android:textSize="12pt"
         android:textColor="@color/primaryTextColor"
@@ -36,22 +36,10 @@
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         android:layout_marginStart="25dp"
+        android:layout_marginBottom="@dimen/margin_text"
         app:layout_constraintStart_toStartOf="@id/message_dialog_title"
         app:layout_constraintTop_toBottomOf="@id/message_dialog_edit"
-        />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/cancel"
-        android:textColor="@color/primaryTextColor"
-        android:background="@color/transparent"
-        android:layout_marginEnd="@dimen/margin_dialog_btn"
-        android:layout_marginBottom="@dimen/margin_text_status"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/message_dialog_delete"
         />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

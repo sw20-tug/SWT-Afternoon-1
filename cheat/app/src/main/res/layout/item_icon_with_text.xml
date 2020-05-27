@@ -5,24 +5,24 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <ImageView
-        android:id="@+id/icon"
+        android:id="@+id/item_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_edit"
         android:tint="@color/primaryTextColor"
-        app:layout_constraintTop_toTopOf="@id/text"
+        app:layout_constraintTop_toTopOf="@id/item_text"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="@id/text"
+        app:layout_constraintBottom_toBottomOf="@id/item_text"
         />
 
     <Button
-        android:id="@+id/text"
+        android:id="@+id/item_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/edit"
         android:textColor="@color/primaryTextColor"
         android:background="@color/transparent"
-        app:layout_constraintStart_toEndOf="@id/icon"
+        app:layout_constraintStart_toEndOf="@id/item_icon"
         app:layout_constraintTop_toTopOf="parent"
         />
 
