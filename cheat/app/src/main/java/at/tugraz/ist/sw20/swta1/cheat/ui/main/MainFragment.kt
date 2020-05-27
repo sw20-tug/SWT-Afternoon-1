@@ -52,6 +52,7 @@ class MainFragment : Fragment() {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
         if (bluetoothAdapter == null) {
             // Device doesn't support bluetooth
+            BluetoothServiceProvider.useMock = true
             Toast.makeText(activity, getString(R.string.no_bluetooth), Toast.LENGTH_SHORT).show()
         } else {
             if (!bluetoothAdapter!!.isEnabled) {
