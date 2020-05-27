@@ -23,6 +23,7 @@ import at.tugraz.ist.sw20.swta1.cheat.ChatActivity
 import at.tugraz.ist.sw20.swta1.cheat.R
 import at.tugraz.ist.sw20.swta1.cheat.RecyclerItemClickListener
 import at.tugraz.ist.sw20.swta1.cheat.bluetooth.BluetoothService
+import at.tugraz.ist.sw20.swta1.cheat.bluetooth.BluetoothServiceProvider
 import at.tugraz.ist.sw20.swta1.cheat.bluetooth.BluetoothState
 import at.tugraz.ist.sw20.swta1.cheat.bluetooth.IBluetoothDevice
 import kotlinx.android.synthetic.main.chat_fragment.view.*
@@ -58,10 +59,10 @@ class ChatFragment : Fragment() {
         // viewModel.insertMessage(ChatEntry("Hi", true, false, Date()))
 
         val header = root.item_header_text.findViewById<TextView>(R.id.title)
-        chatPartner = BluetoothService.getConnectedDevice()
+        chatPartner = BluetoothServiceProvider.getBluetoothService().getConnectedDevice()
         header.text = chatPartner?.name
 
-        BluetoothService.setOnMessageReceive { chatEntry ->
+        BluetoothServiceProvider.getBluetoothService().setOnMessageReceive { chatEntry ->
             chatEntry.isByMe = false
             Log.i("Message", "Message received: ${chatEntry.getMessage()}")
             if (chatEntry.isBySystem && chatEntry.getMessage() == getString(R.string.partner_disconnected))  {
@@ -79,10 +80,10 @@ class ChatFragment : Fragment() {
             }
         }
 
-        BluetoothService.setOnStateChangeListener { _, newState ->
+        BluetoothServiceProvider.getBluetoothService().setOnStateChangeListener { _, newState ->
             val connection_status = root.findViewById<TextView>(R.id.connection_status)
 
-            if (!BluetoothService.isBluetoothEnabled()) {
+            if (!BluetoothServiceProvider.getBluetoothService().isBluetoothEnabled()) {
                 (activity as ChatActivity).goBackToMainActivity()
             }
             activity?.runOnUiThread {
@@ -93,7 +94,7 @@ class ChatFragment : Fragment() {
                         connection_status.text = getString(R.string.disconnected_status)
                         if ((activity as ChatActivity).reconnect) {
                             chatPartner?.let {
-                                BluetoothService.connectToDevice(it)
+                                BluetoothServiceProvider.getBluetoothService().connectToDevice(it)
                             }
                         }
                     }
@@ -129,14 +130,14 @@ class ChatFragment : Fragment() {
     private fun deleteChatEntry(chatEntry: ChatEntry) {
         chatEntry.setDeleted()
         chatAdapter.notifyDataSetChanged()
-        BluetoothService.sendMessage(chatEntry)
+        BluetoothServiceProvider.getBluetoothService().sendMessage(chatEntry)
 
     }
 
     private fun initConnectionButton() {
         val connectionStatus = root.findViewById<TextView>(R.id.connection_status)
         connectionStatus.setOnClickListener {
-            if(BluetoothService.state == BluetoothState.CONNECTED) {
+            if(BluetoothServiceProvider.getBluetoothService().state == BluetoothState.CONNECTED) {
                 (activity as ChatActivity).disconnect()
             }
         }
@@ -148,7 +149,7 @@ class ChatFragment : Fragment() {
 
         btnSend.setOnClickListener {
             val text = etMsg.text.toString().trim()
-            if (BluetoothService.state != BluetoothState.CONNECTED) {
+            if (BluetoothServiceProvider.getBluetoothService().state != BluetoothState.CONNECTED) {
                 Toast.makeText(context, getString(R.string.sending_message_disconnected), Toast.LENGTH_SHORT).show()
             } else if (text.isNotBlank()) {
                 var chatEntry = currentEditMessage
@@ -160,11 +161,11 @@ class ChatFragment : Fragment() {
                     chatEntry = ChatEntry(text, true, false, Date())
                 }
                 val scrollPosition = viewModel.insertMessage(chatEntry)
-                BluetoothService.sendMessage(chatEntry)
                 chatAdapter.notifyDataSetChanged()
                 if(scrollPosition != -1) {
                     recyclerView.smoothScrollToPosition(scrollPosition)
                 }
+                BluetoothServiceProvider.getBluetoothService().sendMessage(chatEntry)
                 etMsg.text.clear()
             }
         }
@@ -223,7 +224,7 @@ class ChatFragment : Fragment() {
         super.onActivityResult(requestCode, resultCode, data)
     
         fun sendImage (bitmap: Bitmap) {
-            if (BluetoothService.state != BluetoothState.CONNECTED) {
+            if (BluetoothServiceProvider.getBluetoothService().state != BluetoothState.CONNECTED) {
                 Toast.makeText(context, context!!.getString(R.string.sending_message_disconnected), Toast.LENGTH_SHORT).show()
             } else {
                 val builder = AlertDialog.Builder(context!!)
@@ -249,8 +250,8 @@ class ChatFragment : Fragment() {
                             chatAdapter.notifyDataSetChanged()
                             recyclerView.smoothScrollToPosition(index)
                         }
-            
-                        BluetoothService.sendMessage(chatEntry)
+
+                        BluetoothServiceProvider.getBluetoothService().sendMessage(chatEntry)
                     }.start()
                 }
     

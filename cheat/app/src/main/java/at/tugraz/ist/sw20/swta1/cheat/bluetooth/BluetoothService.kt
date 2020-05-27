@@ -20,8 +20,8 @@ import java.io.*
 import java.util.*
 
 
-object BluetoothService {
-    var activity : MainActivity? = null
+object BluetoothService : IBluetoothService {
+    override var activity : MainActivity? = null
     private val adapter = BluetoothAdapter.getDefaultAdapter()
     private val tag = "BluetoothService"
     private val connectionTag = "$tag/Connection"
@@ -33,27 +33,27 @@ object BluetoothService {
     private var onStateChange: (BluetoothState, BluetoothState) -> Unit = {_, _ -> }
     private var onMessageReceive: (ChatEntry) -> Any = { chatEntry: ChatEntry -> Log.i(connectionTag, "Received message without listener: ${chatEntry.getMessage()}") }
     
-    val uuid = UUID.fromString("871dc78d-b4c1-4bf4-81f1-52af98e32350")
+    override val uuid = UUID.fromString("871dc78d-b4c1-4bf4-81f1-52af98e32350")
     @Volatile
-    var state: BluetoothState = BluetoothState.DISABLED
+    override var state: BluetoothState = BluetoothState.DISABLED
     
-    fun getPairedDevices() : List<RealBluetoothDevice> {
+    override fun getPairedDevices() : List<IBluetoothDevice> {
         return adapter.bondedDevices.map { device -> RealBluetoothDevice(device) }.toList()
     }
     
-    fun setOnStateChangeListener(onStateChange: (odlState: BluetoothState, newState: BluetoothState) -> Unit) {
+    override fun setOnStateChangeListener(onStateChange: (odlState: BluetoothState, newState: BluetoothState) -> Unit) {
         this.onStateChange = onStateChange
     }
     
-    fun setOnMessageReceive(onMessageReceive: (ChatEntry) -> Any) {
+    override fun setOnMessageReceive(onMessageReceive: (ChatEntry) -> Any) {
         this.onMessageReceive = onMessageReceive
     }
 
-    fun isBluetoothEnabled() : Boolean {
+    override fun isBluetoothEnabled() : Boolean {
         return adapter.isEnabled
     }
 
-    fun setDiscoverable(context: Context,timeInSeconds : Int = 300) {
+    override fun setDiscoverable(context: Context, timeInSeconds : Int) {
         val intent = Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE)
         intent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, timeInSeconds)
         context.startActivity(intent)
@@ -74,13 +74,13 @@ object BluetoothService {
         onStateChange(oldState, state)
     }
     
-    fun setup() {
+    override fun setup() {
         updateState(BluetoothState.READY)
         acceptConnection = AcceptConnection()
         acceptConnection!!.start()
     }
     
-    fun discoverDevices(onDeviceFound: (BluetoothDevice) -> Unit, onDiscoveryStopped: () -> Unit) {
+    override fun discoverDevices(onDeviceFound: (BluetoothDevice) -> Unit, onDiscoveryStopped: () -> Unit) {
         if(state != BluetoothState.READY) {
             return
         }
@@ -138,7 +138,7 @@ object BluetoothService {
         Log.println(Log.DEBUG, tag, "Start discovery")
     }
     
-    fun stopDiscovery() {
+    override fun stopDiscovery() {
         adapter.cancelDiscovery()
         updateState(BluetoothState.READY)
         Log.println(Log.DEBUG, tag, "Stop discovery")
@@ -152,7 +152,7 @@ object BluetoothService {
         }
     }
     
-    fun connectToDevice(device: IBluetoothDevice): Boolean {
+    override fun connectToDevice(device: IBluetoothDevice): Boolean {
         stopDiscovery()
         synchronized(this) {
             if (state != BluetoothState.READY) {
@@ -167,7 +167,7 @@ object BluetoothService {
         return true
     }
     
-    fun sendMessage(message: ChatEntry) : Boolean {
+    override fun sendMessage(message: ChatEntry) : Boolean {
         synchronized(this) {
             if (state != BluetoothState.CONNECTED || currentConnection == null) {
                 return false
@@ -212,7 +212,7 @@ object BluetoothService {
     }
 
     @Synchronized
-    fun disconnect() {
+    override fun disconnect() {
         if (state != BluetoothState.CONNECTED)
         {
             Log.i(connectionTag, "Already disconnected...")
@@ -239,7 +239,7 @@ object BluetoothService {
     }
 
     @Synchronized
-    fun getConnectedDevice () : IBluetoothDevice? {
+    override fun getConnectedDevice () : IBluetoothDevice? {
         return if (state == BluetoothState.CONNECTED && currentConnection != null) {
             currentConnection!!.getDevice()
         } else {

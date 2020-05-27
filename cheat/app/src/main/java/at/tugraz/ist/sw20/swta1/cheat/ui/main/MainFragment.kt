@@ -21,10 +21,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import at.tugraz.ist.sw20.swta1.cheat.ChatActivity
 import at.tugraz.ist.sw20.swta1.cheat.R
 import at.tugraz.ist.sw20.swta1.cheat.RecyclerItemClickListener
-import at.tugraz.ist.sw20.swta1.cheat.bluetooth.BluetoothService
-import at.tugraz.ist.sw20.swta1.cheat.bluetooth.BluetoothState
-import at.tugraz.ist.sw20.swta1.cheat.bluetooth.IBluetoothDevice
-import at.tugraz.ist.sw20.swta1.cheat.bluetooth.RealBluetoothDevice
+import at.tugraz.ist.sw20.swta1.cheat.bluetooth.*
 import at.tugraz.ist.sw20.swta1.cheat.ui.main.adapters.BluetoothDeviceAdapter
 import kotlinx.android.synthetic.main.item_title_cell.view.*
 import java.util.*
@@ -62,7 +59,7 @@ class MainFragment : Fragment() {
                 startActivityForResult(enableBluetoothIntent, REQUEST_ENABLE_BLUETOOTH)
             }
         }
-        BluetoothService.setDiscoverable(context!!)
+        BluetoothServiceProvider.getBluetoothService().setDiscoverable(context!!)
         val root = inflater.inflate(R.layout.main_fragment, container, false)
         lvPairedDevices = root.findViewById(R.id.list_paired_devices)
         lvNearbyDevices = root.findViewById(R.id.list_nearby_devices)
@@ -82,9 +79,9 @@ class MainFragment : Fragment() {
 
         pullToRefreshContainer = root.findViewById<SwipeRefreshLayout>(R.id.pull_to_refresh_container)
         pullToRefreshContainer.setOnRefreshListener {
-            BluetoothService.setDiscoverable(context!!)
+            BluetoothServiceProvider.getBluetoothService().setDiscoverable(context!!)
             viewModel.nearbyDevices.observe(viewLifecycleOwner, Observer { deviceList ->
-                viewModel.bluetoothService.discoverDevices({ device ->
+                BluetoothServiceProvider.getBluetoothService().discoverDevices({ device ->
                     if (deviceList.find { d -> d.address == device.address } == null) {
                         Log.println(Log.INFO, "Found Nearby Device: ", device.name)
                         deviceList.add(RealBluetoothDevice(device))
@@ -124,7 +121,7 @@ class MainFragment : Fragment() {
             }
         }
 
-        BluetoothService.setOnStateChangeListener { oldState, newState ->
+        BluetoothServiceProvider.getBluetoothService().setOnStateChangeListener { oldState, newState ->
             if (newState == BluetoothState.CONNECTED) {
                 val intent = Intent(activity, ChatActivity::class.java)
                 context!!.startActivity(intent)
@@ -155,8 +152,7 @@ class MainFragment : Fragment() {
     }
 
     private fun showBluetoothDevices() {
-        viewModel.bluetoothService = BluetoothService
-        viewModel.bluetoothService.setup()
+        BluetoothServiceProvider.getBluetoothService().setup()
         viewModel.nearbyDevices = MutableLiveData()
         viewModel.nearbyDevices.value = mutableListOf()
 
@@ -165,7 +161,7 @@ class MainFragment : Fragment() {
         }
 
         viewModel.nearbyDevices.observe(viewLifecycleOwner, Observer { deviceList ->
-            viewModel.bluetoothService.discoverDevices({ device ->
+            BluetoothServiceProvider.getBluetoothService().discoverDevices({ device ->
                 if (deviceList.find { d -> d.address == device.address } == null) {
                     Log.println(Log.INFO, "Found Nearby Device: ", device.name)
                     deviceList.add(RealBluetoothDevice(device))
@@ -230,7 +226,7 @@ class MainFragment : Fragment() {
         pullToRefreshContainer.isRefreshing = false
 
         Log.d("Connecting", "Clicked on device '${device.name}'")
-        if(!viewModel.bluetoothService.connectToDevice(device)) {
+        if(!BluetoothServiceProvider.getBluetoothService().connectToDevice(device)) {
             Toast.makeText(context, getString(R.string.connect_to_failed, device.name),
                 Toast.LENGTH_LONG).show()
             Log.e("Connecting", getString(R.string.connect_to_failed, device.name))
