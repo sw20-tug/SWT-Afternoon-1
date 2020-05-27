@@ -39,4 +39,6 @@
 
     <string name="full_image_description">Maximized Image</string>
 
+    <string name="version">Version 1.0</string>
+
 </resources>
