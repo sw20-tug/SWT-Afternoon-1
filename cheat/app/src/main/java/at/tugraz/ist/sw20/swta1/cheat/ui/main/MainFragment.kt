@@ -145,8 +145,7 @@ class MainFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-        // TODO: Use the ViewModel
-        if (bluetoothAdapter != null && bluetoothAdapter!!.isEnabled) {
+        if (BluetoothServiceProvider.getBluetoothService().isBluetoothEnabled()) {
             showBluetoothDevices()
         }
     }
