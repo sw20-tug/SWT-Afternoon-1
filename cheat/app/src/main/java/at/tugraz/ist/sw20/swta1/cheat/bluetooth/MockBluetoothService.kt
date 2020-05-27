@@ -78,7 +78,8 @@ object MockBluetoothService : IBluetoothService {
             Log.w(null, "Tried to send message while not connected")
             return false
         }
-        onMessageReceive(message.cloneWithNewId())
+        if (!message.isDeleted() && !message.isEdited())
+            onMessageReceive(message.cloneWithNewId())
         return true
     }
 
