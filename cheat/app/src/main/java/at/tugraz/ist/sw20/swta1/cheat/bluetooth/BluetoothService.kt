@@ -50,7 +50,7 @@ object BluetoothService : IBluetoothService {
     }
 
     override fun isBluetoothEnabled() : Boolean {
-        return adapter.isEnabled
+        return adapter != null && adapter.isEnabled
     }
 
     override fun setDiscoverable(context: Context, timeInSeconds : Int) {
