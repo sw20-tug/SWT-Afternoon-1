@@ -42,7 +42,6 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
             R.id.about_page -> {
-                Toast.makeText(this, "Enter about page", Toast.LENGTH_SHORT).show()
                 val intent = Intent(this, AboutPageActivity::class.java)
                 startActivity(intent)
                 return true
