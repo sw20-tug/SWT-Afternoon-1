@@ -79,4 +79,8 @@ class ChatEntry(private var message: String, private val image: ByteArray, var i
     public override fun clone(): Any {
         return super.clone()
     }
+
+    fun cloneWithNewId(id: UUID = UUID.randomUUID()): ChatEntry {
+        return ChatEntry(message, image, isByMe, isBySystem, timestamp, id)
+    }
 }

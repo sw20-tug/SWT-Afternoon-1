@@ -12,7 +12,7 @@ interface IBluetoothDevice {
 
 class MockBluetoothDevice(override val name: String, override val address: String) : IBluetoothDevice {
     override fun createSocket(uuid: UUID) : BluetoothSocket {
-        TODO("Not yet implemented")
+        throw NotImplementedError("Cannot create socket to a MockDevice - use MockBluetoothService instead of the real one")
     }
 }
 
