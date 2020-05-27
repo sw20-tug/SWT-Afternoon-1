@@ -22,16 +22,18 @@
             />
 
         <TextView
+            android:id="@+id/about_version"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Version 1.0"
-            android:textSize="20dp"
+            android:text="@string/version"
+            android:textSize="@dimen/version_text_size"
             android:textColor="@color/primaryTextColor"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             />
 
         <TextView
+            android:id="@+id/about_credit_1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/reference1"
@@ -41,6 +43,7 @@
             />
 
         <TextView
+            android:id="@+id/about_credit_2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/reference2"
@@ -50,6 +53,7 @@
             />
 
         <TextView
+            android:id="@+id/about_credit_3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/reference3"
@@ -59,6 +63,7 @@
             />
 
         <TextView
+            android:id="@+id/about_credit_4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/reference4"
