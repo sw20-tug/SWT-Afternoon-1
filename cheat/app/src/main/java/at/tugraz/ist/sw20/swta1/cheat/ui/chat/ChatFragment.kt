@@ -229,23 +229,23 @@ class ChatFragment : Fragment() {
             if (BluetoothServiceProvider.getBluetoothService().state != BluetoothState.CONNECTED) {
                 Toast.makeText(context, context!!.getString(R.string.sending_message_disconnected), Toast.LENGTH_SHORT).show()
             } else {
+                val layout = layoutInflater.inflate(R.layout.dialog_exit_conversation, null) as View
                 val builder = AlertDialog.Builder(context!!)
-                builder.setTitle(context!!.getString(R.string.send_image_dialog_title))
-                builder.setMessage(context!!.getString(R.string.send_image_dialog))
-                
-                Log.d("Image", "Dim: ${bitmap.width}x${bitmap.height}")
-    
-                builder.setPositiveButton(context!!.getString(R.string.dialog_option_yes)) { _, _ ->
+                builder.setView(layout)
+                layout.findViewById<TextView>(R.id.disconnect_dialog_title).text = getString(R.string.send_image_dialog_title)
+                layout.findViewById<TextView>(R.id.disconnect_dialog_text).text = getString(R.string.send_image_dialog)
+                val dialog: AlertDialog = builder.create()
+                layout.findViewById<Button>(R.id.disconnect_dialog_yes).setOnClickListener {
                     Thread {
                         val bos = ByteArrayOutputStream()
                         bitmap.compress(Bitmap.CompressFormat.JPEG, 70, bos)
                         val array: ByteArray = bos.toByteArray()
                         bitmap.recycle()
                         Log.d("Image", "Image compressed, size ${array.size}")
-            
+
                         val chatEntry = ChatEntry("", array, true, false, Date())
                         val index = viewModel.insertMessage(chatEntry)
-            
+
                         activity!!.runOnUiThread {
                             val etMsg = root.item_text_entry_field.findViewById<EditText>(R.id.text_entry)
                             etMsg.text.clear()
@@ -255,11 +255,14 @@ class ChatFragment : Fragment() {
 
                         BluetoothServiceProvider.getBluetoothService().sendMessage(chatEntry)
                     }.start()
+                    dialog.dismiss()
                 }
-    
-                builder.setNegativeButton(context!!.getString(R.string.dialog_option_no)){_,_ -> }
-    
-                val dialog: AlertDialog = builder.create()
+                layout.findViewById<Button>(R.id.disconnect_dialog_no).setOnClickListener {
+                    dialog.dismiss()
+                }
+
+                Log.d("Image", "Dim: ${bitmap.width}x${bitmap.height}")
+
                 dialog.show()
             }
         }
