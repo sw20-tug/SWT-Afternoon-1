@@ -317,7 +317,6 @@ class ChatFragment : Fragment() {
                     dialog.dismiss()
                 }
             }
-        
 
             dialog.show()
         }
