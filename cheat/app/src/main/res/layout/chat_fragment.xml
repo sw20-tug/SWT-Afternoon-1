@@ -47,7 +47,7 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <ImageView
+    <com.jsibbold.zoomage.ZoomageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone"
@@ -56,6 +56,6 @@
         android:background="@color/primaryDarkColor"
         android:adjustViewBounds="true"
         android:scaleType="fitCenter">
-    </ImageView>
+    </com.jsibbold.zoomage.ZoomageView>
 
 </FrameLayout>
