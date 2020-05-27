@@ -21,11 +21,11 @@ class ChatActivity : AppCompatActivity() {
             supportFragmentManager.beginTransaction()
                 .replace(R.id.container, ChatFragment.newInstance())
                 .commitNow()
-            supportActionBar?.hide()
 
             val chatEntry = ChatEntry(getString(R.string.partner_connected), true, true, Date())
             BluetoothServiceProvider.getBluetoothService().sendMessage(chatEntry)
         }
+        supportActionBar?.hide()
     }
 
     override fun onBackPressed() {

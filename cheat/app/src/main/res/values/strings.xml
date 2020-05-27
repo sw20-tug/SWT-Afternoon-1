@@ -16,7 +16,7 @@
     <string name="chat_options_title">Options</string>
     <string name="chat_options_neg">Cancel</string>
     <string name="sending_message_disconnected">Can\'t sent message while disconnected.</string>
-    <string name="no_bluetooth">No Bluetooth available</string>
+    <string name="no_bluetooth">No Bluetooth available, using Mock</string>
     <string name="connection_failed">Connecting failed</string>
     <string name="bluetooth_enabled">Bluetooth enabled</string>
     <string name="bluetooth_disabled">Bluetooth disabled</string>
@@ -41,5 +41,7 @@
     <string name="edit">Edit</string>
     <string name="cancel">Cancel</string>
     <string name="delete">Delete</string>
+
+    <string name="version">Version 1.0</string>
 
 </resources>
