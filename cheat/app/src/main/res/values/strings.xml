@@ -24,6 +24,8 @@
     <string name="connect_to_failed">Connecting to device %1$s failed!</string>
     <string name="send_image_dialog_title">Send Image</string>
     <string name="send_image_dialog">Do you want to send this image?</string>
+    <string name="send_image">Send Images</string>
+    <string name="send_button">Send</string>
     <string name="choose_image_src">Select image source</string>
     <string name="image_creation_failed">Creating temporary image file failed</string>
     <string name="send_image_option_gallery">Gallery</string>

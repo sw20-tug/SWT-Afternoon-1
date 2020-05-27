@@ -180,7 +180,7 @@ class ChatFragment : Fragment() {
             val dialog = AlertDialog.Builder(context!!).create()
             dialog.setView(layout)
             
-            layout.findViewById<Button>(R.id.dialog_image_src_camera).setOnClickListener {
+            layout.findViewById<ImageButton>(R.id.dialog_image_src_camera).setOnClickListener {
                 val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
 
                 val photoFile: File? = try {
@@ -209,7 +209,7 @@ class ChatFragment : Fragment() {
                 }
             }
     
-            layout.findViewById<Button>(R.id.dialog_image_src_gallery).setOnClickListener {
+            layout.findViewById<ImageButton>(R.id.dialog_image_src_gallery).setOnClickListener {
                 val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
                 intent.type = "image/*"
                 dialog.cancel()
