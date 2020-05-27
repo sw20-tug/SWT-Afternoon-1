@@ -59,6 +59,8 @@ class ChatActivity : AppCompatActivity() {
     }
 
     fun goBackToMainActivity() {
+        // do nothing when we receive additional messages
+        BluetoothServiceProvider.getBluetoothService().setOnMessageReceive {}
         super.onBackPressed()
     }
 }
