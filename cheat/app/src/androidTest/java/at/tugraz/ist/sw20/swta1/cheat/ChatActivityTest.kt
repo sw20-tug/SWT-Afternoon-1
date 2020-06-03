@@ -123,26 +123,6 @@ class ChatActivityTest {
     }
 
     @Test
-    fun testCancelDialog() {
-        ActivityScenario.launch(MainActivity::class.java)
-        onView(withId(R.id.list_paired_devices)).perform(click())
-
-        onView(withId(R.id.text_entry)).perform(typeText("This is a test message!"))
-        onView(withId(R.id.btn_send)).perform(click())
-        onView(withId(R.id.text_entry)).check(matches(withText("")))
-
-        onView(withId(R.id.chat_history))
-            .check(matches(atPosition(0, hasDescendant(withText("This is a test message!")))))
-
-        onView(withId(R.id.chat_history))
-            .perform(actionOnItemAtPosition<RecyclerView.ViewHolder>(0, longClick()))
-        onView(withText("CANCEL")).check(matches(isDisplayed())).perform(click())
-        onView(withId(R.id.chat_history))
-            .check(matches(atPosition(0, hasDescendant(withText("This is a test message!")))))
-        onView(withId(R.id.text_entry)).check(matches(withText("")))
-    }
-
-    @Test
     fun testDisconnectUIPositive() {
         ActivityScenario.launch(MainActivity::class.java)
         onView(withId(R.id.list_paired_devices)).perform(click())
