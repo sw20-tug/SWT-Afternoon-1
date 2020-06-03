@@ -1,19 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="margin_text">16dp</dimen>
+    <dimen name="text_size_header">25sp</dimen>
     <dimen name="text_size_normal">20sp</dimen>
     <dimen name="text_size_small">12sp</dimen>
-    <dimen name="separator_hight">0.5dp</dimen>
+    <dimen name="text_size_dialog_message">16sp</dimen>
+
+    <dimen name="margin_text">16dp</dimen>
     <dimen name="margin_text_small">12dp</dimen>
     <dimen name="margin_field_small">12dp</dimen>
     <dimen name="margin_text_status">8dp</dimen>
-    <dimen name="text_size_header">25sp</dimen>
+    <dimen name="margin_dialog_btn">20dp</dimen>
     <dimen name="margin_timestamp">8dp</dimen>
-    <dimen name="chat_item_min_width">100dp</dimen>
     <dimen name="margin_send_btn">6dp</dimen>
-    <dimen name="size_send_btn">55dp</dimen>
+
     <dimen name="padding_send_btn">14dp</dimen>
+    <dimen name="padding_send_btn_end">40dp</dimen>
+    <dimen name="padding_edit_btn">8dp</dimen>
+    <dimen name="padding_dialog_btn">8dp</dimen>
 
+    <dimen name="separator_height">0.5dp</dimen>
+    <dimen name="chat_item_min_width">100dp</dimen>
+    <dimen name="size_send_btn">55dp</dimen>
+    <dimen name="size_cancel_edit_btn">12dp</dimen>
+    <dimen name="size_dialog_button">60dp</dimen>
 
-
+    <dimen name="version_text_size">20sp</dimen>
 </resources>

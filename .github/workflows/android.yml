@@ -28,3 +28,10 @@ jobs:
         name: Build Result
         # Directory containing files to upload
         path: ./cheat/app/build/
+    - name: Upload APK artifact
+      uses: actions/upload-artifact@v1.0.0
+      with:
+        # Artifact name
+        name: APK
+        # Directory containing files to upload
+        path: ./cheat/app/build/outputs/apk/debug/app-debug.apk

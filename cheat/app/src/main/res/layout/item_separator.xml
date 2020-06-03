@@ -8,6 +8,6 @@
         app:layout_constraintTop_toTopOf="parent"
         android:background="@color/separator_dark"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/separator_hight"/>
+        android:layout_height="@dimen/separator_height"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

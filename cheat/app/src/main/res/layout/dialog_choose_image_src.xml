@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/dialogBackground"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/dialog_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/choose_image_src"
+        android:textStyle="bold"
+        android:textSize="12pt"
+        android:textColor="@color/primaryTextColor"
+        android:layout_margin="30dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/dialog_image_src_camera"
+        android:layout_width="@dimen/size_dialog_button"
+        android:layout_height="@dimen/size_dialog_button"
+        android:layout_marginTop="@dimen/margin_dialog_btn"
+        android:layout_marginBottom="@dimen/margin_dialog_btn"
+        android:padding="@dimen/padding_dialog_btn"
+        android:scaleType="fitXY"
+        android:src="@drawable/ic_camera"
+        android:tint="@color/primaryTextColor"
+        android:backgroundTint="@color/transparent"
+        android:contentDescription="@string/send_image_option_camera"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/dialog_image_src_gallery"
+        app:layout_constraintTop_toBottomOf="@+id/dialog_title"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <ImageButton
+        android:id="@+id/dialog_image_src_gallery"
+        android:layout_width="@dimen/size_dialog_button"
+        android:layout_height="@dimen/size_dialog_button"
+        android:layout_marginTop="@dimen/margin_dialog_btn"
+        android:layout_marginBottom="@dimen/margin_dialog_btn"
+        android:padding="@dimen/padding_dialog_btn"
+        android:scaleType="fitXY"
+        android:src="@drawable/ic_gallery"
+        android:tint="@color/primaryTextColor"
+        android:backgroundTint="@color/transparent"
+        android:contentDescription="@string/send_image_option_gallery"
+        app:layout_constraintStart_toEndOf="@+id/dialog_image_src_camera"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/dialog_title"/>
+</androidx.constraintlayout.widget.ConstraintLayout>
