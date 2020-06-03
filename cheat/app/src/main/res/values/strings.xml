@@ -38,6 +38,9 @@
     <string name="reference4"><div>Icons made by <a href="https://www.flaticon.com/authors/pixel-perfect" title="Pixel perfect">Pixel perfect</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div></string>
 
     <string name="full_image_description">Maximized Image</string>
+    <string name="edit">Edit</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
 
     <string name="version">Version 1.0</string>
 
